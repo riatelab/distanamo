@@ -18,7 +18,7 @@ summary.distanamo_interpolation_grid <- function(interpolation_grid, ...) {
   )
   cat("Summary of the interpolation grid:\n")
   cat("Number of cells:", summary_obj$n_cells, "\n")
-  cat("Precision:", summary_obj$resolution, paste0("(α = ", summary_obj$precision, ")"), "\n")
+  cat("Precision:", summary_obj$resolution, paste0("(\u03b1 = ", summary_obj$precision, ")"), "\n")
   cat("Deformation strength:", summary_obj$deformation_strength,"\n")
   return(summary_obj)
 }
