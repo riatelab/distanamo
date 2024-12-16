@@ -11,10 +11,9 @@ Authors@R:
         person(given = "Timothée",
              family = "Giraud",
              email = "timothee.giraud@cnrs.fr",
-             role = c("cre","aut"),
+             role = "ctb",
              comment = c(ORCID = "0000-0002-1932-3323"))
     )
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
 Description: This package enables the creation of what is often defined as a
     distance cartogram. This is done by showing (on background(s) layer(s), such as
     the territorial divisions of the study zone) the local deformations
