@@ -80,7 +80,7 @@ impl InterpolationGrid {
             precision.as_f64(),
             n_iter,
             Some((bbox[0], bbox[1], bbox[2], bbox[3]).into()),
-        );
+        )?;
         Ok(InterpolationGrid { inner: grid })
     }
 
