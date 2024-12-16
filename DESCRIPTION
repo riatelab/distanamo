@@ -1,0 +1,33 @@
+Package: distanamo
+Title: Create Distance Cartograms
+Version: 0.0.0.9000
+Authors@R: 
+    c(
+        person(given = "Matthieu",
+             family = "Viry",
+             email = "matthieu.viry@cnrs.fr",
+             role = c("cre","aut"),
+             comment = c(ORCID = "0000-0002-0693-8556")),
+        person(given = "Timothée",
+             family = "Giraud",
+             email = "timothee.giraud@cnrs.fr",
+             role = c("cre","aut"),
+             comment = c(ORCID = "0000-0002-1932-3323"))
+    )
+    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+Description: This package enables the creation of what is often defined as a
+    distance cartogram. This is done by showing (on background(s) layer(s), such as
+    the territorial divisions of the study zone) the local deformations
+    (calculated using Waldo Tobler's bidimensional regression)
+    to fit image points to source points.
+License: GPL (>= 3)
+BugReports: https://github.com/riatelab/distanamo/issues/
+Depends: 
+    R (>= 3.6.0)
+Imports:
+    sf
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+SystemRequirements: Cargo (Rust's package manager), rustc
+Language: en-US

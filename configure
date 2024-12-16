@@ -1,0 +1,45 @@
+# Even when `cargo` is on `PATH`, `rustc` might not in some cases. This adds
+# ~/.cargo/bin to PATH to address such cases. Note that is not always available
+# (e.g. or on Ubuntu with Rust installed via APT).
+if [ -d "${HOME}/.cargo/bin" ]; then
+  export PATH="${PATH}:${HOME}/.cargo/bin"
+fi
+
+CARGO_VERSION="$(cargo --version)"
+
+if [ $? -ne 0 ]; then
+  echo "-------------- ERROR: CONFIGURATION FAILED --------------------"
+  echo ""
+  echo "The cargo command is not available. To install Rust, please refer"
+  echo "to the official instruction:"
+  echo ""
+  echo "https://www.rust-lang.org/tools/install"
+  echo ""
+  echo "---------------------------------------------------------------"
+
+  exit 1
+fi
+
+# There's a little chance that rustc is not available on PATH while cargo is.
+# So, just ignore the error case.
+RUSTC_VERSION="$(rustc --version || true)"
+
+# Report the version of Rustc to comply with the CRAN policy
+echo "using Rust package manager: '${CARGO_VERSION}'"
+echo "using Rust compiler: '${RUSTC_VERSION}'"
+
+if [ "$(uname)" = "Emscripten" ]; then
+  TARGET="wasm32-unknown-emscripten"
+fi
+
+# catch DEBUG envvar, which is passed from pkgbuild::compile_dll()
+if [ "${DEBUG}" = "true" ]; then
+  PROFILE=dev
+else
+  PROFILE=release
+fi
+
+sed \
+  -e "s/@TARGET@/${TARGET}/" \
+  -e "s/@PROFILE@/${PROFILE}/" \
+  src/Makevars.in > src/Makevars
