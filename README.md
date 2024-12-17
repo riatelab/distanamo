@@ -79,6 +79,11 @@ deformed_background <- dc_interpolate(igrid, background_layer)
 plot(deformed_background)
 ```
 
+## Example
+
+![Example of distance cartogram](./man/figures/ex-1.png)
+*Map made with [`mapsf`](https://github.com/riatelab/mapsf).*
+
 ## License
 
 GPL-3.
