@@ -9,12 +9,12 @@
 }
 
 #' @export
-summary.distanamo_interpolation_grid <- function(interpolation_grid, ...) {
+summary.distanamo_interpolation_grid <- function(object, ...) {
   summary_obj <- list(
-    n_cells = length(interpolation_grid$source_grid),
-    deformation_strength = interpolation_grid$.inner$deformation_strength(),
-    precision = interpolation_grid$precision,
-    resolution = interpolation_grid$resolution
+    n_cells = length(object$source_grid),
+    deformation_strength = object$.inner$deformation_strength(),
+    precision = object$precision,
+    resolution = object$resolution
   )
   cat("Summary of the interpolation grid:\n")
   cat("Number of cells:", summary_obj$n_cells, "\n")
