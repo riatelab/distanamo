@@ -84,6 +84,14 @@ plot(deformed_background)
 ![Example of distance cartogram](./man/figures/ex-1.png)
 *Map made with [`mapsf`](https://github.com/riatelab/mapsf).*
 
+## More information about the method
+
+- This is a port of the **[Darcy](https://thema.univ-fcomte.fr/productions/software/darcy/)** standalone software regarding the bidimensional regression and the backgrounds layers deformation.  
+All credits for the contribution of the method goes to **Colette Cauvin** *(Théma - Univ. Franche-Comté)* and for the reference Java implementation goes to **Gilles Vuidel** *(Théma - Univ. Franche-Comté)*.
+
+- This method is also available as a **QGIS plugin** ([GitHub repository](https://github.com/mthh/QgisDistanceCartogramPlugin) / [QGIS plugin repository](https://plugins.qgis.org/plugins/dist_cartogram/)).
+
+
 ## License
 
 GPL-3.
