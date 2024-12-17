@@ -46,7 +46,7 @@ dependencies = [
 [[package]]
 name = "distance-cartogram"
 version = "0.1.0"
-source = "git+https://github.com/mthh/distance-cartogram-rs#cb73bdebf235c48959e83c431afb98d96c7a25f4"
+source = "git+https://github.com/mthh/distance-cartogram-rs#954d1f03d4cf6b09d189199813afbe2a1781c7ee"
 dependencies = [
  "geo-types",
  "thiserror 2.0.7",

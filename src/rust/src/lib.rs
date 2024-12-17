@@ -124,7 +124,7 @@ impl InterpolationGrid {
             })
             .collect::<Vec<_>>();
 
-        let bg_transformed = self.inner.interpolate_layer(&background_layer);
+        let bg_transformed = self.inner.interpolate_layer(&background_layer)?;
         let out_list = geoms_to_wkb_list(&bg_transformed)?;
 
         Ok(out_list.into())
