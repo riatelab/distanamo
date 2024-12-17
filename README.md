@@ -4,7 +4,7 @@ This package allows you to create distance cartograms (or distance anamorphoses,
 
 ## Installation
 
-You can install the development version of `gepafer` from GitHub with:
+You can install the development version of `distanamo` from GitHub with:
 
 ```R
 # install.packages("remotes")
@@ -12,8 +12,9 @@ remotes::install_github("riatelab/distanamo")
 ```
 
 You will need the [Rust toolchain](https://rustup.rs/) to compile the Rust code.
+The Minimum Supported Rust Version (MSRV) is 1.82.0.
 
-The package is not yet on CRAN.
+The package is not yet on CRAN or on R-universe.
 
 ## Usage
 
