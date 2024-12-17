@@ -1,3 +1,7 @@
+#' @useDynLib distanamo, .registration = TRUE
+#' @keywords internal
+NULL
+
 #' @export
 `$<-.distanamo_interpolation_grid` <- function(x, name, value) {
   stop("distanamo_interpolation_grid cannot be modified", call. = FALSE)
@@ -11,8 +15,8 @@
 #' @export
 summary.distanamo_interpolation_grid <- function(object, ...) {
   summary_obj <- list(
-    n_cells = length(object$source_grid),
-    deformation_strength = object$.inner$deformation_strength(),
+    n_cells = length(sf::st_geometry(object$source_grid)),
+    deformation_strength = .Call(savvy_InterpolationGrid_deformation_strength__impl, object$.ptr),
     precision = object$precision,
     resolution = object$resolution
   )
@@ -20,7 +24,7 @@ summary.distanamo_interpolation_grid <- function(object, ...) {
   cat("Number of cells:", summary_obj$n_cells, "\n")
   cat("Precision:", summary_obj$resolution, paste0("(\u03b1 = ", summary_obj$precision, ")"), "\n")
   cat("Deformation strength:", summary_obj$deformation_strength,"\n")
-  return(summary_obj)
+  return(invisible(summary_obj))
 }
 
 #' dc_create
@@ -53,7 +57,8 @@ dc_create <- function (
     niter <- round(4 * sqrt(length(source_points)))
   }
   e <- new.env(parent = emptyenv())
-  e$.inner <- InterpolationGrid$new(
+  e$.ptr <- .Call(
+    savvy_InterpolationGrid_new__impl,
     sf::st_as_binary(sf::st_geometry(source_points)),
     sf::st_as_binary(sf::st_geometry(image_points)),
     precision,
@@ -61,11 +66,11 @@ dc_create <- function (
     bbox
   )
   e$crs <- sf::st_crs(source_points)
-  e$source_grid <- sf::st_set_crs(.source_grid(e$.inner), e$crs)
-  e$interpolated_grid <- sf::st_set_crs(.interpolated_grid(e$.inner), e$crs)
+  e$source_grid <- sf::st_set_crs(.source_grid(e$.ptr), e$crs)
+  e$interpolated_grid <- sf::st_set_crs(.interpolated_grid(e$.ptr), e$crs)
   e$precision <- precision
-  e$resolution <- e$.inner$resolution()
-  e$bbox <- e$.inner$bbox()
+  e$resolution <- .Call(savvy_InterpolationGrid_resolution__impl, e$.ptr)
+  e$bbox <- .Call(savvy_InterpolationGrid_bbox__impl, e$.ptr)
   names(e$bbox) <- c('xmin', 'ymin', 'xmax', 'ymax')
   class(e) <- "distanamo_interpolation_grid"
   return(e)
@@ -83,8 +88,11 @@ dc_interpolate <- function (
   layer_to_deform
 ) {
   source_crs <- sf::st_crs(layer_to_deform)
-  res <- interpolation_grid$.inner$transform_layer(sf::st_as_binary(sf::st_geometry(layer_to_deform)))
-  
+  res <- .Call(
+    savvy_InterpolationGrid_transform_layer__impl,
+    interpolation_grid$.ptr,
+    sf::st_as_binary(sf::st_geometry(layer_to_deform))
+  )
   layer <- sf::st_sf(layer_to_deform)
   sf::st_geometry(layer) <- sf::st_as_sfc(res)
   return(sf::st_set_crs(layer, source_crs))
@@ -124,7 +132,8 @@ dc_move_points <- function(points, times, factor) {
   if (factor <= 0) {
     stop('Factor must be a non-null positive value')
   }
-  new_points <- move_points_from_times(
+  new_points <- .Call(
+    savvy_move_points_from_times__impl,
     sf::st_as_binary(sf::st_geometry(points)),
     times,
     factor
@@ -142,8 +151,10 @@ dc_move_points <- function(points, times, factor) {
 #' @param interpolation_grid The interpolation grid
 #' @return The source grid as an sf layer
 #' @noRd
-.source_grid <- function(interpolation_grid) {
-  grid <- sf::st_as_sfc(interpolation_grid$get_source_grid())
+.source_grid <- function(ptr) {
+  grid <- sf::st_as_sfc(
+    .Call(savvy_InterpolationGrid_get_source_grid__impl, ptr)
+  )
   return(sf::st_sf(geometry=grid))
 }
 
@@ -153,7 +164,9 @@ dc_move_points <- function(points, times, factor) {
 #' @param interpolation_grid The interpolation grid
 #' @return The interpolated grid as an sf layer
 #' @noRd
-.interpolated_grid <- function(interpolation_grid) {
-  grid <- sf::st_as_sfc(interpolation_grid$get_interpolated_grid())
+.interpolated_grid <- function(ptr) {
+  grid <- sf::st_as_sfc(
+    .Call(savvy_InterpolationGrid_get_interpolated_grid__impl, ptr)
+  )
   return(sf::st_sf(geometry=grid))
 }
