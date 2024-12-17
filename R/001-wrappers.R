@@ -44,7 +44,7 @@ dc_create <- function (
   niter
 ) {
   if (
-    !is.na(sf::st_crs(source_points) != sf::st_crs(image_points))
+    !(is.na(sf::st_crs(source_points)) && is.na(sf::st_crs(image_points)))
     && sf::st_crs(source_points) != sf::st_crs(image_points)
   ) {
     stop("The source and image point layers must have the same CRS")
@@ -105,6 +105,35 @@ dc_combine_bbox <- function(list_layers) {
     ymax = max(b1["ymax"], b2["ymax"])
   ), lapply(list_layers, sf::st_bbox))
   return(combined_bbox)
+}
+
+
+#' dc_move_points
+#'
+#' Move points.
+#' @param points The points to be moved
+#' @param times The times between the points (note that)
+#' the reference point should have a time of 0 and that times
+#' and points should be in the same order.
+#' @param factor The factor of displacement (default: 1)
+#' @export
+dc_move_points <- function(points, times, factor) {
+  if (missing(factor)) {
+    factor <- 1
+  }
+  if (factor <= 0) {
+    stop('Factor must be a non-null positive value')
+  }
+  new_points <- move_points_from_times(
+    sf::st_as_binary(sf::st_geometry(points)),
+    times,
+    factor
+  )
+  source_crs <- sf::st_crs(points)
+
+  layer <- sf::st_sf(points)
+  sf::st_geometry(layer) <- sf::st_as_sfc(new_points)
+  return(sf::st_set_crs(layer, source_crs))
 }
 
 #' .source_grid

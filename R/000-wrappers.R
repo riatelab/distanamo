@@ -38,6 +38,10 @@ NULL
 }
 
 
+`move_points_from_times` <- function(`points`, `times`, `factor`) {
+  .Call(savvy_move_points_from_times__impl, `points`, `times`, `factor`)
+}
+
 ### wrapper functions for InterpolationGrid
 
 `InterpolationGrid_get_source_grid` <- function(self) {

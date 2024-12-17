@@ -1,4 +1,4 @@
-use distance_cartogram::{Grid, GridType};
+use distance_cartogram::{move_points, CentralTendency, Grid, GridType};
 use geo_traits::to_geo::ToGeoGeometry;
 use geo_types::Coord;
 use savvy::{
@@ -147,4 +147,25 @@ impl InterpolationGrid {
         let out: Vec<f64> = vec![bbox.xmin, bbox.ymin, bbox.xmax, bbox.ymax];
         out.try_into()
     }
+}
+
+#[savvy]
+fn move_points_from_times(
+    points: ListSexp,
+    times: RealSexp,
+    factor: NumericScalar,
+) -> savvy::Result<Sexp> {
+    let points = convert_wkb_point_to_coords(points)?;
+    let new_points = move_points(
+        &points,
+        times.as_slice(),
+        factor.as_f64(),
+        CentralTendency::Mean,
+    )?;
+    let new_points = new_points
+        .into_iter()
+        .map(|p| geo_types::Geometry::Point(geo_types::Point(p)))
+        .collect::<Vec<geo_types::Geometry>>();
+    let out_list = geoms_to_wkb_list(&new_points)?;
+    Ok(out_list.into())
 }
