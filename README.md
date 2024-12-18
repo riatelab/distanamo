@@ -52,23 +52,24 @@ and all the others).
 ```R
 # Read source points and layer to be deformed
 source_pts <- sf::st_read('data-source-point.geojson')
-background_layer <- sf::st_read('ackground.geojson')
+background_layer <- sf::st_read('background.geojson')
 bbox <- sf::st_bbox(background_layer)
 
 # Read duration between points
-d <-read.csv('mat.csv')
+d <-read.csv('mat.csv', row.names = 1)
 # The CSV is a time matrix structured as follow
 #           AGEN   BORDEAUX   GRENOBLE etc.
 # AGEN      0.0    111.2      200.3
 # BORDEAUX  112.3  0.0        300.1
 # GRENOBLE  199.4  301.1      0.0
 # etc.
-d <- data.frame(d)
-dv <- as.double(d |> dplyr::filter(d$X == 'GRENOBLE'))
-dv <- dv[!is.na(dv)]
+dv <- d['GRENOBLE', ]
+# So we have only the duration between GRENOBLE and all the other points
+#          AGEN   BORDEAUX   GRENOBLE etc.
+# GRENOBLE 199.4  301.1      0.0
 
 # Move points to create the image points layer
-image_pts <- dc_move_points(source_pts, dv)
+image_pts <- dc_move_points(source_pts, as.double(dv))
 
 # Create the interpolation grid
 igrid <- dc_create(source_pts, image_pts, 2.0, bbox)

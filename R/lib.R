@@ -169,6 +169,7 @@ dc_combine_bbox <- function(list_layers) {
 #' the reference point should have a time of 0 and that times
 #' and points should be in the same order.
 #' @param factor The factor of displacement (default: 1)
+#' @return The moved points
 #' @export
 dc_move_points <- function(points, times, factor) {
   if (missing(factor)) {
