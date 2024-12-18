@@ -29,7 +29,32 @@ summary.distanamo_interpolation_grid <- function(object, ...) {
 
 #' dc_create
 #'
-#' Create the interpolation grid.
+#' Create a new interpolation grid which covers the source points and with a cell size
+#' deduced from the precision.
+#'
+#' The grid is then interpolated to match the
+#' image points. This then allows one to interpolate any point on the grid
+#' (enabling the deformation of geometries such as background layers)
+#' and to retrieve useful metrics about the deformation.
+#'
+#' If the bbox provided does not cover all the source points, the grid will
+#' be extended to cover all the source points.
+#'
+#' The precision controls the size of the grid cells (higher is more precise,
+#' for example 0.5 generally gives a coarse result, 2 a satisfactory result
+#' and 4 a particularly fine result). A precision of 2 is usually a good
+#' default value.
+#'
+#' The number of iterations controls the number of iterations for the
+#' interpolation. It is generally 4 times the square root of the number of
+#' points (and this is the default value it the niter parameter is not
+#' provided.
+#'
+#' Note that the number of source points must be equal to the number of
+#' image points, and either they must be supplied in the same order
+#' (as they are homologous points), or the name of a field containing
+#' an identifier must be supplied to enable them to be sorted in the
+#' same order.
 #' @param source_points The source point layer
 #' @param image_points The image point layer
 #' @param precision The precision of the grid to be created
@@ -38,6 +63,7 @@ summary.distanamo_interpolation_grid <- function(object, ...) {
 #' @param bbox The bounding box of the grid to be created
 #' @param niter The number of iterations (using `round(4 * sqrt(length(source_points)))`
 #' is a good default for this value)
+#' @param sort_by The field to sort the source and image points by
 #' @return An interpolation grid to be used to transform the layers
 #' @export
 dc_create <- function (
@@ -45,14 +71,33 @@ dc_create <- function (
   image_points,
   precision,
   bbox,
-  niter
+  niter,
+  sort_by
 ) {
+  # The CRS must be the same for the source and image points
+  # but we allow the CRS to be missing for both the source and image points
   if (
     !(is.na(sf::st_crs(source_points)) && is.na(sf::st_crs(image_points)))
     && sf::st_crs(source_points) != sf::st_crs(image_points)
   ) {
     stop("The source and image point layers must have the same CRS")
   }
+  # The source_points and image_points must have the same number of points
+  if (length(sf::st_geometry(source_points)) != length(sf::st_geometry(image_points))) {
+    stop("The source and image point layers must have the same number of points")
+  }
+  # If the sort_by argument is given, we sort the source and image points
+  # by the field given in the sort_by argument
+  if (!missing(sort_by)) {
+    # Source_points and image_points must have this field
+    if (!sort_by %in% names(source_points) || !sort_by %in% names(image_points)) {
+      stop("The source and image point layers must have the field given in the sort_by argument")
+    }
+    source_points <- source_points[order(source_points[[sort_by]]),]
+    image_points <- image_points[order(image_points[[sort_by]]),]
+  }
+  # If the niter argument is missing or is not a positive integer, we
+  # compute the number of iterations as 4 times the square root of the number
   if (missing(niter) || niter <= 0) {
     niter <- round(4 * sqrt(length(source_points)))
   }

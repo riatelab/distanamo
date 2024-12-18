@@ -4,7 +4,7 @@
 \alias{dc_create}
 \title{dc_create}
 \usage{
-dc_create(source_points, image_points, precision, bbox, niter)
+dc_create(source_points, image_points, precision, bbox, niter, sort_by)
 }
 \arguments{
 \item{source_points}{The source point layer}
@@ -19,10 +19,34 @@ dc_create(source_points, image_points, precision, bbox, niter)
 
 \item{niter}{The number of iterations (using \code{round(4 * sqrt(length(source_points)))}
 is a good default for this value)}
+
+\item{sort_by}{The field to sort the source and image points by}
 }
 \value{
 An interpolation grid to be used to transform the layers
 }
 \description{
-Create the interpolation grid.
+Create a new interpolation grid which covers the source points and with a cell size
+deduced from the precision.
+}
+\details{
+The grid is then interpolated to match the
+image points. This then allows one to interpolate any point on the grid
+(enabling the deformation of geometries such as background layers)
+and to retrieve useful metrics about the deformation.
+If the bbox provided does not cover all the source points, the grid will
+be extended to cover all the source points.
+The precision controls the size of the grid cells (higher is more precise,
+for example 0.5 generally gives a coarse result, 2 a satisfactory result
+and 4 a particularly fine result). A precision of 2 is usually a good
+default value.
+The number of iterations controls the number of iterations for the
+interpolation. It is generally 4 times the square root of the number of
+points (and this is the default value it the niter parameter is not
+provided.
+Note that the number of source points must be equal to the number of
+image points, and either they must be supplied in the same order
+(as they are homologous points), or the name of a field containing
+an identifier must be supplied to enable them to be sorted in the
+same order.
 }
