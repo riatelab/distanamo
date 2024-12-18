@@ -18,7 +18,7 @@ The package is not yet on CRAN or on R-universe.
 
 ## Usage
 
-To use this package you need to provide to sets of homologuous points : *source points* and *image points*.
+To use this package you need to provide to sets of homologous points : *source points* and *image points*.
 
 ```R
 # Read source points, image points and the background layer to deform
@@ -42,9 +42,9 @@ plot(igrid$interpolated_grid)
 summary(igrid)
 ```
 
-Optionnaly you can provide a layer of source points and matrix of duration between
+Optionally you can provide a layer of source points and matrix of duration between
 the points.
-This duration matrix will be used to extract the duraction between a reference points
+This duration matrix will be used to extract the duration between a reference points
 and all the other points, allowing to move closer / farther points from the reference point
 depending if they can be reached faster or slower of the mean speed (between the reference point
 and all the others).
@@ -95,4 +95,4 @@ All credits for the contribution of the method goes to **Colette Cauvin** *(Thé
 
 ## License
 
-GPL-3.
+**GPL-3.0**
