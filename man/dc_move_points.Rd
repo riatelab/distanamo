@@ -7,7 +7,7 @@
 dc_move_points(points, times, factor)
 }
 \arguments{
-\item{points}{The points to be moved}
+\item{points}{The points to be moved, an sf POINT object}
 
 \item{times}{The times between the points (note that)
 the reference point should have a time of 0 and that times
@@ -16,8 +16,25 @@ and points should be in the same order.}
 \item{factor}{The factor of displacement (default: 1)}
 }
 \value{
-The moved points
+An sf object of moved points is returned.
 }
 \description{
 Move points.
+}
+\examples{
+library(sf)
+start <- st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+                 layer = "start", quiet = TRUE)
+points <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+                   layer = "points", quiet = TRUE)
+center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+                   layer = "center", quiet = TRUE)
+
+pts <- rbind(start, points[,-c(1:2)])
+durations <-  c(0, points$durations)
+pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
+
+plot(st_geometry(center))
+plot(st_geometry(pts), add = TRUE, pch = 4, cex = .5)
+plot(st_geometry(pts_moved), add = TRUE, pch = 4, cex = .5, col = "red")
 }

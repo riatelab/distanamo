@@ -17,3 +17,35 @@ The sf layer deformed by the interpolation grid
 \description{
 Interpolate a sf layer using the interpolation grid.
 }
+\examples{
+library(sf)
+start <- st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+                 layer = "start", quiet = TRUE)
+points <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+                   layer = "points", quiet = TRUE)
+center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+                   layer = "center", quiet = TRUE)
+
+
+pts <- rbind(start, points[,-c(1:2)])
+pts$id <- seq_len(nrow(pts))
+durations <-  c(0, points$durations)
+pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
+
+bbox <- dc_combine_bbox(list_layers = list(points, center))
+
+# Create the interpolation grid
+igrid <- dc_create(
+  source_points = pts,
+  image_points = pts_moved,
+  precision = 2,
+  bbox = bbox,
+  sort_by = "id"
+)
+
+# Deform the target layer
+center_deform <- dc_interpolate(interpolation_grid = igrid, layer_to_deform = center)
+
+plot(st_geometry(igrid$interpolated_grid), col = NA)
+plot(st_geometry(center_deform), add = TRUE)
+}

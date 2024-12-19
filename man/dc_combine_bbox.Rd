@@ -7,12 +7,24 @@
 dc_combine_bbox(list_layers)
 }
 \arguments{
-\item{list_layers}{A list of sf layers}
+\item{list_layers}{A list of sf objects}
 }
 \value{
-The bounding box as a vector of doubles (as sf::st_bbox)
+An sf bounding box is returned.
 }
 \description{
-Takes a list of sf layers and compute the bounding box
+Takes a list of sf objects and compute the bounding box
 that covers them all.
+}
+\examples{
+library(sf)
+start <- st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+                 layer = "start", quiet = TRUE)
+points <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+                   layer = "points", quiet = TRUE)
+center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+                   layer = "center", quiet = TRUE)
+
+bbox <- dc_combine_bbox(list(start, points, center))
+bbox
 }
