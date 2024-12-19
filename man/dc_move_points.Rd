@@ -15,6 +15,9 @@ and points should be in the same order.}
 
 \item{factor}{The factor of displacement (default: 1)}
 }
+\value{
+The moved points
+}
 \description{
 Move points.
 }

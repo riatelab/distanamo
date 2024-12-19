@@ -18,11 +18,11 @@ The package is not yet on CRAN or on R-universe.
 
 ## Usage
 
-To use this package you need to provide to sets of homologous points : *source points* and *image points*.
+To use this package you need to provide two sets of homologous points : *source points* and *image points*.
 
 ```R
 # Read source points, image points and the background layer to deform
-source_pts <- sf::st_read('ata-source-point.geojson')
+source_pts <- sf::st_read('data-source-point.geojson')
 image_pts <- sf::st_read('data-image-point.geojson')
 background_layer <- sf::st_read('background.geojson')
 bbox <- sf::st_bbox(background_layer)
@@ -44,9 +44,10 @@ summary(igrid)
 
 Optionally you can provide a layer of source points and matrix of duration between
 the points.
+
 This duration matrix will be used to extract the duration between a reference points
 and all the other points, allowing to move closer / farther points from the reference point
-depending if they can be reached faster or slower of the mean speed (between the reference point
+depending on if they can be reached faster or slower of the mean speed (between the reference point
 and all the others).
 
 ```R
@@ -92,6 +93,8 @@ All credits for the contribution of the method goes to **Colette Cauvin** *(Thé
 
 - This method is also available as a **QGIS plugin** ([GitHub repository](https://github.com/mthh/QgisDistanceCartogramPlugin) / [QGIS plugin repository](https://plugins.qgis.org/plugins/dist_cartogram/)).
 
+- This R package is a wrapper around the Rust library [`distance-cartogram-rs`](https://github.com/mthh/distance-cartogram-rs)
+  which is well documented and can be used directly from Rust.
 
 ## License
 

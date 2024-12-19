@@ -34,16 +34,20 @@ The grid is then interpolated to match the
 image points. This then allows one to interpolate any point on the grid
 (enabling the deformation of geometries such as background layers)
 and to retrieve useful metrics about the deformation.
+
 If the bbox provided does not cover all the source points, the grid will
 be extended to cover all the source points.
+
 The precision controls the size of the grid cells (higher is more precise,
 for example 0.5 generally gives a coarse result, 2 a satisfactory result
 and 4 a particularly fine result). A precision of 2 is usually a good
 default value.
+
 The number of iterations controls the number of iterations for the
 interpolation. It is generally 4 times the square root of the number of
 points (and this is the default value it the niter parameter is not
 provided.
+
 Note that the number of source points must be equal to the number of
 image points, and either they must be supplied in the same order
 (as they are homologous points), or the name of a field containing
