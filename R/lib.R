@@ -158,6 +158,7 @@ dc_interpolate <- function (
 #'                    layer = "points", quiet = TRUE)
 #' center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
 #'                    layer = "center", quiet = TRUE)
+#'
 #' bbox <- dc_combine_bbox(list(start, points, center))
 #' bbox
 dc_combine_bbox <- function(list_layers) {
@@ -177,13 +178,29 @@ dc_combine_bbox <- function(list_layers) {
 #' dc_move_points
 #'
 #' Move points.
-#' @param points The points to be moved
+#' @param points The points to be moved, an sf POINT object
 #' @param times The times between the points (note that)
 #' the reference point should have a time of 0 and that times
 #' and points should be in the same order.
 #' @param factor The factor of displacement (default: 1)
-#' @return The moved points
+#' @return An sf object of moved points is returned.
 #' @export
+#' @examples
+#' library(sf)
+#' start <- st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'                  layer = "start", quiet = TRUE)
+#' points <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'                    layer = "points", quiet = TRUE)
+#' center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'                    layer = "center", quiet = TRUE)
+#'
+#' pts <- rbind(start, points[,-c(1:2)])
+#' durations <-  c(0, points$durations)
+#' pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
+#'
+#' plot(st_geometry(center))
+#' plot(st_geometry(pts), add = TRUE, pch = 4, cex = .5)
+#' plot(st_geometry(pts_moved), add = TRUE, pch = 4, cex = .5, col = "red")
 dc_move_points <- function(points, times, factor) {
   if (missing(factor)) {
     factor <- 1
