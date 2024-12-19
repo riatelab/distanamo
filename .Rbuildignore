@@ -6,3 +6,5 @@
 ^LICENSE\.md$
 
 .idea/
+
+^dev
