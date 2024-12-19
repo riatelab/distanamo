@@ -78,7 +78,7 @@ summary.distanamo_interpolation_grid <- function(object, ...) {
 #'
 #' pts <- rbind(start, points[,-c(1:2)])
 #' pts$id <- seq_len(nrow(pts))
-#' durations <-  c(0, points$durations+10)
+#' durations <-  c(0, points$durations)
 #' pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
 #'
 #' bbox <- dc_combine_bbox(list_layers = list(points, center))
@@ -172,7 +172,7 @@ dc_create <- function (
 #'
 #' pts <- rbind(start, points[,-c(1:2)])
 #' pts$id <- seq_len(nrow(pts))
-#' durations <-  c(0, points$durations+10)
+#' durations <-  c(0, points$durations)
 #' pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
 #'
 #' bbox <- dc_combine_bbox(list_layers = list(points, center))

@@ -7,9 +7,9 @@
 dc_create(source_points, image_points, precision, bbox, niter, sort_by)
 }
 \arguments{
-\item{source_points}{The source point layer}
+\item{source_points}{The source point layer, sf POINT object}
 
-\item{image_points}{The image point layer}
+\item{image_points}{The image point layer, sf POINT object}
 
 \item{precision}{The precision of the grid to be created
 (a higher value means a higher precision - 0.5 gives usually a coarse result,
@@ -17,8 +17,8 @@ dc_create(source_points, image_points, precision, bbox, niter, sort_by)
 
 \item{bbox}{The bounding box of the grid to be created}
 
-\item{niter}{The number of iterations (using \code{round(4 * sqrt(length(source_points)))}
-is a good default for this value)}
+\item{niter}{The number of iterations
+(default is  \code{round(4 * sqrt(length(source_points)))})}
 
 \item{sort_by}{The field to sort the source and image points by}
 }
@@ -53,4 +53,37 @@ image points, and either they must be supplied in the same order
 (as they are homologous points), or the name of a field containing
 an identifier must be supplied to enable them to be sorted in the
 same order.
+}
+\examples{
+library(sf)
+start <- st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+                 layer = "start", quiet = TRUE)
+points <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+                   layer = "points", quiet = TRUE)
+center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+                   layer = "center", quiet = TRUE)
+
+
+pts <- rbind(start, points[,-c(1:2)])
+pts$id <- seq_len(nrow(pts))
+durations <-  c(0, points$durations)
+pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
+
+bbox <- dc_combine_bbox(list_layers = list(points, center))
+
+# Create the interpolation grid
+igrid <- dc_create(
+  source_points = pts,
+  image_points = pts_moved,
+  precision = 2,
+  bbox = bbox,
+  sort_by = "id"
+)
+
+# Deform the target layer
+center_deform <- dc_interpolate(interpolation_grid = igrid, layer_to_deform = center)
+
+plot(st_geometry(igrid$interpolated_grid), col = NA)
+plot(st_geometry(center_deform), add = TRUE)
+
 }
