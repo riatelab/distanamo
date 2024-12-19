@@ -55,17 +55,49 @@ summary.distanamo_interpolation_grid <- function(object, ...) {
 #' (as they are homologous points), or the name of a field containing
 #' an identifier must be supplied to enable them to be sorted in the
 #' same order.
-#' @param source_points The source point layer
-#' @param image_points The image point layer
+#' @param source_points The source point layer, sf POINT object
+#' @param image_points The image point layer, sf POINT object
 #' @param precision The precision of the grid to be created
 #' (a higher value means a higher precision - 0.5 gives usually a coarse result,
 #' 2 is good default, 4 is very detailed).
 #' @param bbox The bounding box of the grid to be created
-#' @param niter The number of iterations (using `round(4 * sqrt(length(source_points)))`
-#' is a good default for this value)
+#' @param niter The number of iterations
+#' (default is  `round(4 * sqrt(length(source_points)))`)
 #' @param sort_by The field to sort the source and image points by
 #' @return An interpolation grid to be used to transform the layers
 #' @export
+#' @examples
+#' library(sf)
+#' start <- st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'                  layer = "start", quiet = TRUE)
+#' points <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'                    layer = "points", quiet = TRUE)
+#' center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'                    layer = "center", quiet = TRUE)
+#'
+#'
+#' pts <- rbind(start, points[,-c(1:2)])
+#' pts$id <- seq_len(nrow(pts))
+#' durations <-  c(0, points$durations+10)
+#' pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
+#'
+#' bbox <- dc_combine_bbox(list_layers = list(points, center))
+#'
+#' # Create the interpolation grid
+#' igrid <- dc_create(
+#'   source_points = pts,
+#'   image_points = pts_moved,
+#'   precision = 2,
+#'   bbox = bbox,
+#'   sort_by = "id"
+#' )
+#'
+#' # Deform the target layer
+#' center_deform <- dc_interpolate(interpolation_grid = igrid, layer_to_deform = center)
+#'
+#' plot(st_geometry(igrid$interpolated_grid), col = NA)
+#' plot(st_geometry(center_deform), add = TRUE)
+#'
 dc_create <- function (
   source_points,
   image_points,
@@ -128,6 +160,37 @@ dc_create <- function (
 #' @param layer_to_deform The sf layer to interpolate
 #' @return The sf layer deformed by the interpolation grid
 #' @export
+#' @examples
+#' library(sf)
+#' start <- st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'                  layer = "start", quiet = TRUE)
+#' points <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'                    layer = "points", quiet = TRUE)
+#' center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'                    layer = "center", quiet = TRUE)
+#'
+#'
+#' pts <- rbind(start, points[,-c(1:2)])
+#' pts$id <- seq_len(nrow(pts))
+#' durations <-  c(0, points$durations+10)
+#' pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
+#'
+#' bbox <- dc_combine_bbox(list_layers = list(points, center))
+#'
+#' # Create the interpolation grid
+#' igrid <- dc_create(
+#'   source_points = pts,
+#'   image_points = pts_moved,
+#'   precision = 2,
+#'   bbox = bbox,
+#'   sort_by = "id"
+#' )
+#'
+#' # Deform the target layer
+#' center_deform <- dc_interpolate(interpolation_grid = igrid, layer_to_deform = center)
+#'
+#' plot(st_geometry(igrid$interpolated_grid), col = NA)
+#' plot(st_geometry(center_deform), add = TRUE)
 dc_interpolate <- function (
   interpolation_grid,
   layer_to_deform
