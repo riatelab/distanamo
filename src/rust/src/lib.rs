@@ -147,6 +147,18 @@ impl InterpolationGrid {
         let out: Vec<f64> = vec![bbox.xmin, bbox.ymin, bbox.xmax, bbox.ymax];
         out.try_into()
     }
+
+    pub fn mae(&self) -> savvy::Result<Sexp> {
+        self.inner.mae().try_into()
+    }
+
+    pub fn rmse(&self) -> savvy::Result<Sexp> {
+        self.inner.rmse().try_into()
+    }
+
+    pub fn r_squared(&self) -> savvy::Result<Sexp> {
+        self.inner.r_squared().try_into()
+    }
 }
 
 #[savvy]

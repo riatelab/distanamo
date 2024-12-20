@@ -9,3 +9,6 @@ SEXP savvy_InterpolationGrid_deformation_strength__ffi(SEXP self__);
 SEXP savvy_InterpolationGrid_sum_squared_deformation_strength__ffi(SEXP self__);
 SEXP savvy_InterpolationGrid_resolution__ffi(SEXP self__);
 SEXP savvy_InterpolationGrid_bbox__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_mae__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_rmse__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_r_squared__ffi(SEXP self__);

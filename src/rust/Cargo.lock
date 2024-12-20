@@ -25,9 +25,9 @@ checksum = "1fd0f2584146f6f2ef48085050886acf353beff7305ebd1ae69500e27c67f64b"
 
 [[package]]
 name = "cc"
-version = "1.2.4"
+version = "1.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9157bbaa6b165880c27a4293a474c91cdcf265cc68cc829bf10be0964a391caf"
+checksum = "c31a0499c1dc64f458ad13872de75c0eb7e3fdb0e67964610c914b034fc5956e"
 dependencies = [
  "shlex",
 ]
@@ -46,7 +46,7 @@ dependencies = [
 [[package]]
 name = "distance-cartogram"
 version = "0.1.0"
-source = "git+https://github.com/mthh/distance-cartogram-rs#713ae88f1c7bc65fcad7beb69cc5fadc36ebffab"
+source = "git+https://github.com/mthh/distance-cartogram-rs#53237844b6243fd85138a9de501873d7b81fab54"
 dependencies = [
  "geo-types",
  "thiserror 2.0.8",
