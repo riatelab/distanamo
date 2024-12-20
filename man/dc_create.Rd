@@ -65,7 +65,6 @@ center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
 
 
 pts <- rbind(start, points[,-c(1:2)])
-pts$id <- seq_len(nrow(pts))
 durations <-  c(0, points$durations)
 pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
 
@@ -77,11 +76,11 @@ igrid <- dc_create(
   image_points = pts_moved,
   precision = 2,
   bbox = bbox,
-  sort_by = "id"
 )
 
 # Deform the target layer
-center_deform <- dc_interpolate(interpolation_grid = igrid, layer_to_deform = center)
+center_deform <- dc_interpolate(interpolation_grid = igrid,
+                                layer_to_deform = center)
 
 plot(st_geometry(igrid$interpolated_grid), col = NA)
 plot(st_geometry(center_deform), add = TRUE)
