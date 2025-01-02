@@ -34,8 +34,13 @@ SEXP handle_result(SEXP res_) {
     return (SEXP)res;
 }
 
-SEXP savvy_move_points_from_times__impl(SEXP c_arg__points, SEXP c_arg__times, SEXP c_arg__factor) {
-    SEXP res = savvy_move_points_from_times__ffi(c_arg__points, c_arg__times, c_arg__factor);
+SEXP savvy_move_points_from_durations__impl(SEXP c_arg__points, SEXP c_arg__durations, SEXP c_arg__factor) {
+    SEXP res = savvy_move_points_from_durations__ffi(c_arg__points, c_arg__durations, c_arg__factor);
+    return handle_result(res);
+}
+
+SEXP savvy_generate_positions_from_durations_matrix__impl(SEXP c_arg__points, SEXP c_arg__durations) {
+    SEXP res = savvy_generate_positions_from_durations_matrix__ffi(c_arg__points, c_arg__durations);
     return handle_result(res);
 }
 
@@ -96,7 +101,8 @@ SEXP savvy_InterpolationGrid_r_squared__impl(SEXP self__) {
 
 
 static const R_CallMethodDef CallEntries[] = {
-    {"savvy_move_points_from_times__impl", (DL_FUNC) &savvy_move_points_from_times__impl, 3},
+    {"savvy_move_points_from_durations__impl", (DL_FUNC) &savvy_move_points_from_durations__impl, 3},
+    {"savvy_generate_positions_from_durations_matrix__impl", (DL_FUNC) &savvy_generate_positions_from_durations_matrix__impl, 2},
     {"savvy_InterpolationGrid_new__impl", (DL_FUNC) &savvy_InterpolationGrid_new__impl, 5},
     {"savvy_InterpolationGrid_get_source_grid__impl", (DL_FUNC) &savvy_InterpolationGrid_get_source_grid__impl, 1},
     {"savvy_InterpolationGrid_get_interpolated_grid__impl", (DL_FUNC) &savvy_InterpolationGrid_get_interpolated_grid__impl, 1},

@@ -276,7 +276,7 @@ dc_move_points <- function(points, times, factor) {
     stop('Factor must be a non-null positive value')
   }
   new_points <- .Call(
-    savvy_move_points_from_times__impl,
+    savvy_move_points_from_durations__impl,
     sf::st_as_binary(sf::st_geometry(points)),
     times,
     factor
@@ -284,6 +284,28 @@ dc_move_points <- function(points, times, factor) {
   source_crs <- sf::st_crs(points)
 
   layer <- sf::st_sf(points)
+  sf::st_geometry(layer) <- sf::st_as_sfc(new_points)
+  return(sf::st_set_crs(layer, source_crs))
+}
+
+#' dc_generate_positions_from_durations
+#'
+#' Generate positions from durations matrix.
+#' TODO: Add documentation about what happens when this
+#' func is called and why its used.
+#' @param durations The durations matrix
+#' @param source_points The source points, an sf POINT object
+#' @return An sf POINT object is returned.
+#' @export
+dc_generate_positions_from_durations <- function(durations, source_points) {
+  new_points <- .Call(
+    savvy_generate_positions_from_durations_matrix__impl,
+    sf::st_as_binary(sf::st_geometry(source_points)),
+    as.matrix(durations)
+  )
+  source_crs <- sf::st_crs(source_points)
+
+  layer <- sf::st_sf(source_points)
   sf::st_geometry(layer) <- sf::st_as_sfc(new_points)
   return(sf::st_set_crs(layer, source_crs))
 }
