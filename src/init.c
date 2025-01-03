@@ -99,6 +99,11 @@ SEXP savvy_InterpolationGrid_r_squared__impl(SEXP self__) {
     return handle_result(res);
 }
 
+SEXP savvy_InterpolationGrid_interpolated_points__impl(SEXP self__) {
+    SEXP res = savvy_InterpolationGrid_interpolated_points__ffi(self__);
+    return handle_result(res);
+}
+
 
 static const R_CallMethodDef CallEntries[] = {
     {"savvy_move_points_from_durations__impl", (DL_FUNC) &savvy_move_points_from_durations__impl, 3},
@@ -114,6 +119,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"savvy_InterpolationGrid_mae__impl", (DL_FUNC) &savvy_InterpolationGrid_mae__impl, 1},
     {"savvy_InterpolationGrid_rmse__impl", (DL_FUNC) &savvy_InterpolationGrid_rmse__impl, 1},
     {"savvy_InterpolationGrid_r_squared__impl", (DL_FUNC) &savvy_InterpolationGrid_r_squared__impl, 1},
+    {"savvy_InterpolationGrid_interpolated_points__impl", (DL_FUNC) &savvy_InterpolationGrid_interpolated_points__impl, 1},
     {NULL, NULL, 0}
 };
 

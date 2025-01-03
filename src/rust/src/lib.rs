@@ -161,6 +161,14 @@ impl InterpolationGrid {
     pub fn r_squared(&self) -> savvy::Result<Sexp> {
         self.inner.r_squared().try_into()
     }
+
+    pub fn interpolated_points(&self) -> savvy::Result<Sexp> {
+        let points = self.inner.interpolated_points()
+            .iter().map(|p| geo_types::Geometry::Point(geo_types::Point(*p))).collect::<Vec<_>>();
+        let out_list = geoms_to_wkb_list(&points)?;
+
+        Ok(out_list.into())
+    }
 }
 
 #[savvy]
