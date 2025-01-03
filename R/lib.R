@@ -14,6 +14,7 @@ NULL
 
 #' @export
 summary.distanamo_interpolation_grid <- function(object, ...) {
+  if (!inherits(object, "distanamo_interpolation_grid")) stop("Not a distanamo_interpolation_grid object")
   summary_obj <- list(
     deformation_strength = .Call(savvy_InterpolationGrid_deformation_strength__impl, object$.ptr),
     mae = .Call(savvy_InterpolationGrid_mae__impl, object$.ptr),
@@ -31,6 +32,52 @@ summary.distanamo_interpolation_grid <- function(object, ...) {
   cat("Root mean squared error:", summary_obj$rmse, "\n")
   cat("R squared:", summary_obj$r_squared, "\n")
   return(invisible(summary_obj))
+}
+
+#' @export
+plot.distanamo_interpolation_grid <- function(
+  x,
+  which = 1:3,
+  ask = interactive(),
+  caption = list("Source grid", "Interpolated grid", "Image to interpolated points"),
+  ...
+) {
+  if (!inherits(x, "distanamo_interpolation_grid")) stop("Not a distanamo_interpolation_grid object")
+  if (!is.numeric(which) || any(which < 1) || any(which > 3)) stop("'which' must be in 1:3")
+
+  if (ask) {
+    oask <- devAskNewPage(TRUE)
+    on.exit(devAskNewPage(oask))
+  }
+
+  plots <- list(
+    source_grid = function () {
+      plot(sf::st_geometry(x$source_grid), main = caption[1], col = "green")
+    },
+    interpolated_grid = function () {
+      plot(sf::st_geometry(x$interpolated_grid), main = caption[2], col = "pink")
+    },
+    image_to_interpolated_points = function () {
+      plot(sf::st_geometry(x$source_points), main = caption[3], col = "blue")
+      plot(sf::st_geometry(x$image_points), col = "red", add = TRUE)
+      # We suppress the warnings because the arrows function
+      # may alert us about zero-length arrows
+      suppressWarnings({
+        arrows(
+          x0 = sf::st_coordinates(x$source_points)[, 1],
+          y0 = sf::st_coordinates(x$source_points)[, 2],
+          x1 = sf::st_coordinates(x$image_points)[, 1],
+          y1 = sf::st_coordinates(x$image_points)[, 2],
+          col = "black",
+          length = 0.1
+        )
+      })
+    }
+  )
+
+  plot_names <- c("source_grid", "interpolated_grid", "image_to_interpolated_points")
+
+  for (i in which) plots[[plot_names[i]]]()
 }
 
 #' dc_create
@@ -150,6 +197,8 @@ dc_create <- function (
   e$crs <- sf::st_crs(source_points)
   e$source_grid <- sf::st_set_crs(.source_grid(e$.ptr), e$crs)
   e$interpolated_grid <- sf::st_set_crs(.interpolated_grid(e$.ptr), e$crs)
+  e$source_points <- source_points
+  e$image_points <- image_points
   e$precision <- precision
   e$resolution <- .Call(savvy_InterpolationGrid_resolution__impl, e$.ptr)
   e$bbox <- .Call(savvy_InterpolationGrid_bbox__impl, e$.ptr)

@@ -2,6 +2,7 @@
 
 S3method("$<-",distanamo_interpolation_grid)
 S3method("[[<-",distanamo_interpolation_grid)
+S3method(plot,distanamo_interpolation_grid)
 S3method(summary,distanamo_interpolation_grid)
 export(dc_combine_bbox)
 export(dc_create)
