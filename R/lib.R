@@ -58,20 +58,21 @@ plot.distanamo_interpolation_grid <- function(
       plot(sf::st_geometry(x$interpolated_grid), main = caption[2], col = "pink")
     },
     image_to_interpolated_points = function () {
-      plot(sf::st_geometry(x$source_points), main = caption[3], col = "blue")
-      plot(sf::st_geometry(x$image_points), col = "red", add = TRUE)
-      # We suppress the warnings because the arrows function
-      # may alert us about zero-length arrows
-      suppressWarnings({
-        arrows(
-          x0 = sf::st_coordinates(x$source_points)[, 1],
-          y0 = sf::st_coordinates(x$source_points)[, 2],
-          x1 = sf::st_coordinates(x$image_points)[, 1],
-          y1 = sf::st_coordinates(x$image_points)[, 2],
-          col = "black",
-          length = 0.1
-        )
-      })
+      plot(sf::st_geometry(x$image_points), main = caption[3], col = "blue")
+      plot(sf::st_geometry(x$interpolated_points), col = "red", add = TRUE)
+      c_image <- sf::st_coordinates(x$image_points)
+      c_interpolated <- sf::st_coordinates(x$interpolated_points)
+      # We dont want to draw arrows if the point in the image is the same as the point in the interpolated
+      # (we need to filter in both c_image and c_interpolated because they are homologuous points in the same order)
+      cc_image <- c_image[!identical(c_image, c_interpolated),]
+      cc_interpolated <- c_interpolated[!identical(c_image, c_interpolated),]
+      arrows(
+        x0 = cc_image[,1],
+        y0 = cc_image[,2],
+        x1 = cc_interpolated[,1],
+        y1 = cc_interpolated[,2],
+        length = 0.1
+      )
     }
   )
 
@@ -199,6 +200,7 @@ dc_create <- function (
   e$interpolated_grid <- sf::st_set_crs(.interpolated_grid(e$.ptr), e$crs)
   e$source_points <- source_points
   e$image_points <- image_points
+  e$interpolated_points <- sf::st_set_crs(.interpolated_points(e$.ptr), e$crs)
   e$precision <- precision
   e$resolution <- .Call(savvy_InterpolationGrid_resolution__impl, e$.ptr)
   e$bbox <- .Call(savvy_InterpolationGrid_bbox__impl, e$.ptr)
@@ -383,4 +385,17 @@ dc_generate_positions_from_durations <- function(durations, source_points) {
     .Call(savvy_InterpolationGrid_get_interpolated_grid__impl, ptr)
   )
   return(sf::st_sf(geometry=grid))
+}
+
+#' .interpolated_points
+#'
+#' Retrieve the interpolated points as an sf layer
+#' @param interpolation_grid The interpolation grid
+#' @return The interpolated points as an sf layer
+#' @noRd
+.interpolated_points <- function(ptr) {
+  pts <- sf::st_as_sfc(
+    .Call(savvy_InterpolationGrid_interpolated_points__impl, ptr)
+  )
+  return(sf::st_sf(geometry=pts))
 }
