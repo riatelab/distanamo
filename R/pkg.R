@@ -9,3 +9,37 @@
 #' source points.
 #' @docType package
 "_PACKAGE"
+
+#' @useDynLib distanamo, .registration = TRUE
+#' @keywords internal
+NULL
+
+#' @export
+`$<-.distanamo_interpolation_grid` <- function(x, name, value) {
+  stop("distanamo_interpolation_grid cannot be modified", call. = FALSE)
+}
+
+#' @export
+`[[<-.distanamo_interpolation_grid` <- function(x, i, value) {
+  stop("distanamo_interpolation_grid cannot be modified", call. = FALSE)
+}
+
+#' @export
+`$<-.distanamo_multipolar_displacement_result` <- function(x, name, value) {
+  stop("distanamo_multipolar_displacement_result cannot be modified", call. = FALSE)
+}
+
+#' @export
+`[[<-.distanamo_multipolar_displacement_result` <- function(x, i, value) {
+  stop("distanamo_multipolar_displacement_result cannot be modified", call. = FALSE)
+}
+
+#' @export
+`$<-.distanamo_unipolar_displacement_result` <- function(x, name, value) {
+  stop("distanamo_unipolar_displacement_result cannot be modified", call. = FALSE)
+}
+
+#' @export
+`[[<-.distanamo_unipolar_displacement_result` <- function(x, i, value) {
+  stop("distanamo_unipolar_displacement_result cannot be modified", call. = FALSE)
+}
