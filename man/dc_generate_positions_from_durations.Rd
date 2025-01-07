@@ -12,8 +12,11 @@ dc_generate_positions_from_durations(durations, source_points)
 \item{source_points}{The source points, an sf POINT object}
 }
 \value{
-A list object with the source points and the image points
+A list object with the source points and the image points, ready
+to be used with the dc_create function
 }
 \description{
-Generate positions from durations matrix.
+Generate positions from durations matrix, using PCoA to find the relative
+positions between points, then perform a procrustes analysis to find the
+best fit between the source points and the image points.
 }

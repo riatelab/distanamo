@@ -46,7 +46,7 @@ Optionally you can provide a layer of source points and matrix of duration betwe
 the points.
 
 This duration matrix will be used to extract the duration between a reference points
-and all the other points, allowing to use the `dc_move_points` function to move closer / farther
+and all the other points, allowing to use the `dc_move_from_reference_point` function to move closer / farther
 points from the reference point depending on if they can be reached faster or slower of
 the mean speed (between the reference point and all the others).
 
@@ -58,6 +58,7 @@ bbox <- sf::st_bbox(background_layer)
 
 # Read duration between points
 d <-read.csv('mat.csv', row.names = 1)
+
 # The CSV is a time matrix structured as follow
 #           AGEN   BORDEAUX   GRENOBLE etc.
 # AGEN      0.0    111.2      200.3
@@ -69,8 +70,18 @@ dv <- d['GRENOBLE', ]
 #          AGEN   BORDEAUX   GRENOBLE etc.
 # GRENOBLE 199.4  301.1      0.0
 
+source_pts$durations <- as.double(dv)
+
+ref_point <- subset(source_pts, source_pts$NOM_COM == "GRENOBLE")
+other_points <- subset(source_pts, !source_pts$NOM_COM == "GRENOBLE")
+
 # Move points to create the image points layer
-positioning_result <- dc_move_points(source_pts, as.double(dv))
+positioning_result <- dc_move_from_reference_point(
+  reference_point = ref_point,
+  other_points = other_points,
+  duration_col_name = "durations",
+  factor = 1
+)
 
 # Create the interpolation grid
 igrid <- dc_create(
@@ -116,7 +127,12 @@ summary(pos_result)
 plot(pos_result)
 
 # Create the interpolation grid
-igrid <- dc_create(pos_result$source_points, pos_result$image_points, 2.0, sf::st_bbox(background_layer))
+igrid <- dc_create(
+  pos_result$source_points,
+  pos_result$image_points,
+  2.0,
+  sf::st_bbox(background_layer)
+)
 
 summary(igrid)
 plot(igrid)

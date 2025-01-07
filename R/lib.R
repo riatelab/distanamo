@@ -108,13 +108,18 @@ plot.distanamo_interpolation_grid <- function(
 #' @export
 summary.distanamo_multipolar_displacement_result <- function(object, ...) {
   if (!inherits(object, "distanamo_multipolar_displacement_result")) stop("Not a distanamo_multipolar_displacement_result object")
+  dists <- sf::st_distance(object$source_points, object$image_points, by_element = TRUE)
   summary_obj <- list(
     error = object$error,
-    mean_displacement = mean(sf::st_distance(object$source_points, object$image_points, by_element = TRUE))
+    min_displacement = min(dists),
+    mean_displacement = mean(dists),
+    max_displacement = max(dists)
   )
   cat("Summary of the multipolar displacement result:\n")
   cat("Error (procrustes distance):", summary_obj$error, "\n")
+  cat("Min displacement:", summary_obj$min_displacement, paste0("[", units::deparse_unit(summary_obj$min_displacement), "]"), "\n")
   cat("Mean displacement:", summary_obj$mean_displacement, paste0("[", units::deparse_unit(summary_obj$mean_displacement), "]"), "\n")
+  cat("Max displacement:", summary_obj$max_displacement, paste0("[", units::deparse_unit(summary_obj$max_displacement), "]"), "\n")
   return(invisible(summary_obj))
 }
 
@@ -142,11 +147,18 @@ plot.distanamo_multipolar_displacement_result <- function(x, ...) {
 #' @export
 summary.distanamo_unipolar_displacement_result <- function(object, ...) {
   if (!inherits(object, "distanamo_unipolar_displacement_result")) stop("Not a distanamo_unipolar_displacement_result object")
+  # We don't take into account the first point as it is the reference point and
+  # it was not moved
+  dists <- sf::st_distance(object$source_points[-1,], object$image_points[-1,], by_element = TRUE)
   summary_obj <- list(
-    mean_displacement = mean(sf::st_distance(object$source_points, object$image_points, by_element = TRUE))
+    min_displacement = min(dists),
+    mean_displacement = mean(dists),
+    max_displacement = max(dists)
   )
   cat("Summary of the unipolar displacement result:\n")
+  cat("Min displacement:", summary_obj$min_displacement, paste0("[", units::deparse_unit(summary_obj$min_displacement), "]"), "\n")
   cat("Mean displacement:", summary_obj$mean_displacement, paste0("[", units::deparse_unit(summary_obj$mean_displacement), "]"), "\n")
+  cat("Max displacement:", summary_obj$max_displacement, paste0("[", units::deparse_unit(summary_obj$max_displacement), "]"), "\n")
   return(invisible(summary_obj))
 }
 
@@ -219,10 +231,12 @@ plot.distanamo_unipolar_displacement_result <- function(x, ...) {
 #' center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
 #'                    layer = "center", quiet = TRUE)
 #'
-#'
-#' pts <- rbind(start, points[,-c(1:2)])
-#' durations <-  c(0, points$durations)
-#' pos_result <- dc_move_points(points = pts, times = durations, factor = 1)
+#' pos_result <- dc_move_from_reference_point(
+#'   reference_point = start,
+#'   other_points = points,
+#'   duration_col_name = "durations",
+#'   factor = 1
+#' )
 #'
 #' bbox <- dc_combine_bbox(list_layers = list(points, center))
 #'
@@ -315,10 +329,12 @@ dc_create <- function (
 #' center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
 #'                    layer = "center", quiet = TRUE)
 #'
-#'
-#' pts <- rbind(start, points[,-c(1:2)])
-#' durations <-  c(0, points$durations)
-#' pos_result <- dc_move_points(points = pts, times = durations, factor = 1)
+#' pos_result <- dc_move_from_reference_point(
+#'   reference_point = start,
+#'   other_points = points,
+#'   duration_col_name = "durations",
+#'   factor = 1
+#' )
 #'
 #' bbox <- dc_combine_bbox(list_layers = list(points, center))
 #'
@@ -350,6 +366,33 @@ dc_interpolate <- function (
   sf::st_geometry(layer) <- sf::st_as_sfc(res)
   return(sf::st_set_crs(layer, source_crs))
 }
+
+#' dc_interpolate_parallel
+#'
+#' Interpolate a list of sf layers using the interpolation grid.
+#' @param interpolation_grid The interpolation grid
+#' @param layers_to_deform A list of sf layers to interpolate
+#' @return The sf layers deformed by the interpolation grid
+#' @export
+dc_interpolate_parallel <- function (
+  interpolation_grid,
+  layers_to_deform
+) {
+  l <- lapply(layers_to_deform, function(layer) sf::st_as_binary(sf::st_geometry(layer)))
+  res <- .Call(
+    savvy_InterpolationGrid_transform_layers_parallel__impl,
+    interpolation_grid$.ptr,
+    l
+  )
+  for (i in seq_along(layers_to_deform)) {
+    layer <- layers_to_deform[[i]]
+    source_crs <- sf::st_crs(layer)
+    sf::st_geometry(layer) <- sf::st_as_sfc(res[[i]])
+    l[[i]] <- sf::st_set_crs(layer, source_crs)
+  }
+  return(l)
+}
+
 
 #' dc_combine_bbox
 #'
@@ -383,15 +426,18 @@ dc_combine_bbox <- function(list_layers) {
 }
 
 
-#' dc_move_points
+#' dc_move_from_reference_point
 #'
-#' Move points.
-#' @param points The points to be moved, an sf POINT object
-#' @param times The times between the points (note that)
-#' the reference point should have a time of 0 and that times
-#' and points should be in the same order.
+#' Move points from a reference point using durations between the reference point
+#' and all the other points.
+#' @param reference_point The point from which the other points will be moved,
+#' an sf POINT object
+#' @param other_points The other points to move, an sf POINT object
+#' @param duration_col_name The name of the column containing the durations
+#' in the other_points sf object
 #' @param factor The factor of displacement (default: 1)
-#' @return A list object with the source points and the image points
+#' @return A list object with the source points and the image points, ready
+#' to be used with the dc_create function
 #' @export
 #' @examples
 #' library(sf)
@@ -402,32 +448,54 @@ dc_combine_bbox <- function(list_layers) {
 #' center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
 #'                    layer = "center", quiet = TRUE)
 #'
-#' pts <- rbind(start, points[,-c(1:2)])
-#' durations <-  c(0, points$durations)
-#' pos_result <- dc_move_points(points = pts, times = durations, factor = 1)
+#' pos_result <- dc_move_from_reference_point(
+#'   reference_point = start,
+#'   other_points = points,
+#'   duration_col_name = "durations",
+#'   factor = 1
+#' )
 #'
 #' plot(st_geometry(pos_result$source_points), pch = 4, cex = .5)
 #' plot(st_geometry(pos_result$image_points), add = TRUE, pch = 4, cex = .5, col = "red")
 #' plot(st_geometry(center), add = TRUE)
-dc_move_points <- function(points, times, factor) {
+dc_move_from_reference_point <- function(reference_point, other_points, duration_col_name, factor) {
   if (missing(factor)) {
     factor <- 1
   }
   if (factor <= 0) {
     stop('Factor must be a non-null positive value')
   }
+  if (length(sf::st_geometry(reference_point)) != 1) {
+      stop('Reference point must be a single point')
+  }
+  if (length(sf::st_geometry(other_points)) == 0) {
+      stop('No other points to move')
+  }
+  if (sf::st_crs(reference_point) != sf::st_crs(other_points)) {
+    stop('The reference point and the other points must have the same CRS')
+  }
+
+  points <- sf::st_set_crs(
+    sf::st_sf(geometry=c(sf::st_geometry(reference_point), sf::st_geometry(other_points))),
+    sf::st_crs(reference_point)
+  )
+
+  durations <- c(0, other_points[[duration_col_name]])
+
   new_points <- .Call(
     savvy_move_points_from_durations__impl,
     sf::st_as_binary(sf::st_geometry(points)),
-    times,
+    durations,
     factor
   )
+
   source_crs <- sf::st_crs(points)
 
   layer <- sf::st_sf(points)
   sf::st_geometry(layer) <- sf::st_as_sfc(new_points)
   new_points <- sf::st_set_crs(layer, source_crs)
   li <- list(
+    reference_point = reference_point,
     source_points = points,
     image_points = new_points
   )
@@ -438,10 +506,13 @@ dc_move_points <- function(points, times, factor) {
 
 #' dc_generate_positions_from_durations
 #'
-#' Generate positions from durations matrix.
+#' Generate positions from durations matrix, using PCoA to find the relative
+#' positions between points, then perform a procrustes analysis to find the
+#' best fit between the source points and the image points.
 #' @param durations The durations matrix
 #' @param source_points The source points, an sf POINT object
-#' @return A list object with the source points and the image points
+#' @return A list object with the source points and the image points, ready
+#' to be used with the dc_create function
 #' @export
 dc_generate_positions_from_durations <- function(durations, source_points) {
   li <- .Call(

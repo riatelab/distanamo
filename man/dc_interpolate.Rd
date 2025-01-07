@@ -26,17 +26,19 @@ points <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
 center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
                    layer = "center", quiet = TRUE)
 
-
-pts <- rbind(start, points[,-c(1:2)])
-durations <-  c(0, points$durations)
-pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
+pos_result <- dc_move_from_reference_point(
+  reference_point = start,
+  other_points = points,
+  duration_col_name = "durations",
+  factor = 1
+)
 
 bbox <- dc_combine_bbox(list_layers = list(points, center))
 
 # Create the interpolation grid
 igrid <- dc_create(
-  source_points = pts,
-  image_points = pts_moved,
+  source_points = pos_result$source_points,
+  image_points = pos_result$image_points,
   precision = 2,
   bbox = bbox,
 )
