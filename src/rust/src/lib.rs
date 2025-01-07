@@ -22,6 +22,13 @@ fn geoms_to_wkb_list(geoms: &[geo_types::Geometry]) -> savvy::Result<OwnedListSe
     Ok(out)
 }
 
+fn coords_to_points(coords: &[Coord]) -> Vec<geo_types::Geometry> {
+    coords
+        .iter()
+        .map(|c| geo_types::Geometry::Point(geo_types::Point(*c)))
+        .collect()
+}
+
 fn convert_wkb_point_to_coords(points: ListSexp) -> savvy::Result<Vec<Coord>> {
     points
         .values_iter()
@@ -195,10 +202,8 @@ impl InterpolationGrid {
     }
 
     pub fn interpolated_points(&self) -> savvy::Result<Sexp> {
-        let points = self.inner.interpolated_points()
-            .iter().map(|p| geo_types::Geometry::Point(geo_types::Point(*p))).collect::<Vec<_>>();
+        let points = coords_to_points(self.inner.interpolated_points());
         let out_list = geoms_to_wkb_list(&points)?;
-
         Ok(out_list.into())
     }
 }
@@ -218,11 +223,7 @@ fn move_points_from_durations(
         CentralTendency::Mean,
     )?;
 
-    let new_points = new_points
-        .into_iter()
-        .map(|p| geo_types::Geometry::Point(geo_types::Point(p)))
-        .collect::<Vec<geo_types::Geometry>>();
-
+    let new_points = coords_to_points(&new_points);
     let out_list = geoms_to_wkb_list(&new_points)?;
 
     Ok(out_list.into())
@@ -269,9 +270,7 @@ fn generate_positions_from_durations_matrix(
 
     let mut out_list = OwnedListSexp::new(2, true)?;
 
-    let points = geoms_to_wkb_list(&positioning_result.points.into_iter()
-        .map(|p| geo_types::Geometry::Point(geo_types::Point(p)))
-        .collect::<Vec<geo_types::Geometry>>())?;
+    let points = geoms_to_wkb_list(&coords_to_points(&positioning_result.points))?;
 
     out_list.set_name_and_value(0, "image_points", points)?;
     out_list.set_name_and_value::<Sexp>(1, "error", positioning_result.error.try_into()?)?;
