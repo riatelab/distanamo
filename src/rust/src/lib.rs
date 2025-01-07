@@ -196,6 +196,56 @@ fn move_points_from_durations(
     Ok(out_list.into())
 }
 
+// #[savvy]
+// fn generate_positions_from_durations_matrix(
+//     points: ListSexp,
+//     durations: RealSexp,
+// ) -> savvy::Result<Sexp> {
+//     let points = convert_wkb_point_to_coords(points)?;
+//
+//     // We expect the durations matrix to be a square matrix so we only
+//     // store one dimension number
+//     let dim = if let Some(dim) = durations.get_dim() {
+//         if dim.len() != 2 || dim[0] != dim[1] {
+//             return Err(savvy_err!("Expected a 2D square matrix of durations"));
+//         }
+//         if dim[0] != points.len() as i32 {
+//             return Err(savvy_err!(
+//                 "Number of points and rows in durations matrix do not match"
+//             ));
+//         }
+//         dim[0]
+//     } else {
+//         return Err(savvy_err!(
+//             "No dimensions found for the matrix of durations"
+//         ));
+//     };
+//
+//     // We need to convert the duration matrix (which is column-major)
+//     // to a row-major Vec of Vecs
+//     let durations = durations.as_slice();
+//     let mut durations_matrix = Vec::new();
+//     for i in 0..dim {
+//         let mut row = Vec::new();
+//         for j in 0..dim {
+//             row.push(durations[(j * dim + i) as usize]);
+//         }
+//         durations_matrix.push(row);
+//     }
+//
+//     let positioning_result = generate_positions_from_durations(durations_matrix, &points)?;
+//
+//     let new_points = positioning_result
+//         .points
+//         .into_iter()
+//         .map(|p| geo_types::Geometry::Point(geo_types::Point(p)))
+//         .collect::<Vec<geo_types::Geometry>>();
+//
+//     let out_list = geoms_to_wkb_list(&new_points)?;
+//
+//     Ok(out_list.into())
+// }
+
 #[savvy]
 fn generate_positions_from_durations_matrix(
     points: ListSexp,
@@ -235,13 +285,14 @@ fn generate_positions_from_durations_matrix(
 
     let positioning_result = generate_positions_from_durations(durations_matrix, &points)?;
 
-    let new_points = positioning_result
-        .points
-        .into_iter()
-        .map(|p| geo_types::Geometry::Point(geo_types::Point(p)))
-        .collect::<Vec<geo_types::Geometry>>();
+    let mut out_list = OwnedListSexp::new(2, true)?;
 
-    let out_list = geoms_to_wkb_list(&new_points)?;
+    let points = geoms_to_wkb_list(&positioning_result.points.into_iter()
+        .map(|p| geo_types::Geometry::Point(geo_types::Point(p)))
+        .collect::<Vec<geo_types::Geometry>>())?;
+
+    out_list.set_name_and_value(0, "image_points", points)?;
+    out_list.set_name_and_value::<Sexp>(1, "error", positioning_result.error.try_into()?)?;
 
     Ok(out_list.into())
 }

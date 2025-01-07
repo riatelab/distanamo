@@ -13,6 +13,27 @@ NULL
 }
 
 #' @export
+`$<-.distanamo_multipolar_displacement_result` <- function(x, name, value) {
+  stop("distanamo_multipolar_displacement_result cannot be modified", call. = FALSE)
+}
+
+#' @export
+`[[<-.distanamo_multipolar_displacement_result` <- function(x, i, value) {
+  stop("distanamo_multipolar_displacement_result cannot be modified", call. = FALSE)
+}
+
+#' @export
+`$<-.distanamo_unipolar_displacement_result` <- function(x, name, value) {
+  stop("distanamo_unipolar_displacement_result cannot be modified", call. = FALSE)
+}
+
+#' @export
+`[[<-.distanamo_unipolar_displacement_result` <- function(x, i, value) {
+  stop("distanamo_unipolar_displacement_result cannot be modified", call. = FALSE)
+}
+
+
+#' @export
 summary.distanamo_interpolation_grid <- function(object, ...) {
   if (!inherits(object, "distanamo_interpolation_grid")) stop("Not a distanamo_interpolation_grid object")
   summary_obj <- list(
@@ -62,23 +83,92 @@ plot.distanamo_interpolation_grid <- function(
       plot(sf::st_geometry(x$interpolated_points), col = "red", add = TRUE)
       c_image <- sf::st_coordinates(x$image_points)
       c_interpolated <- sf::st_coordinates(x$interpolated_points)
-      # We dont want to draw arrows if the point in the image is the same as the point in the interpolated
-      # (we need to filter in both c_image and c_interpolated because they are homologuous points in the same order)
-      cc_image <- c_image[!identical(c_image, c_interpolated),]
-      cc_interpolated <- c_interpolated[!identical(c_image, c_interpolated),]
+      # We dont want to draw arrows if the point in c_image is the same
+      # as the point in c_interpolated
+      identical_pts <-identical(c_image, c_interpolated)
+      cc_image <- c_image[!identical_pts,]
+      cc_interpolated <- c_interpolated[!identical_pts,]
       arrows(
         x0 = cc_image[,1],
         y0 = cc_image[,2],
         x1 = cc_interpolated[,1],
         y1 = cc_interpolated[,2],
-        length = 0.1
+        length = 0.075
       )
+      legend("topleft", legend = c("Image points", "Interpolated points"),
+             col = c("blue", "red"), pt.lwd = 1, bty = "n", cex = 0.8, pch = 1)
     }
   )
 
   plot_names <- c("source_grid", "interpolated_grid", "image_to_interpolated_points")
 
   for (i in which) plots[[plot_names[i]]]()
+}
+
+#' @export
+summary.distanamo_multipolar_displacement_result <- function(object, ...) {
+  if (!inherits(object, "distanamo_multipolar_displacement_result")) stop("Not a distanamo_multipolar_displacement_result object")
+  summary_obj <- list(
+    error = object$error,
+    mean_displacement = mean(sf::st_distance(object$source_points, object$image_points, by_element = TRUE))
+  )
+  cat("Summary of the multipolar displacement result:\n")
+  cat("Error (procrustes distance):", summary_obj$error, "\n")
+  cat("Mean displacement:", summary_obj$mean_displacement, paste0("[", units::deparse_unit(summary_obj$mean_displacement), "]"), "\n")
+  return(invisible(summary_obj))
+}
+
+#' @export
+plot.distanamo_multipolar_displacement_result <- function(x, ...) {
+  if (!inherits(x, "distanamo_multipolar_displacement_result")) stop("Not a distanamo_multipolar_displacement_result object")
+  plot(sf::st_geometry(x$source_points), col = "blue", main = "Source points to image points displacement")
+  plot(sf::st_geometry(x$image_points), col = "red", add = TRUE)
+  c_source <- sf::st_coordinates(x$source_points)
+  c_image <- sf::st_coordinates(x$image_points)
+  identical_pts <-identical(c_source, c_image)
+  cc_source <- c_source[!identical_pts,]
+  cc_image <- c_image[!identical_pts,]
+  arrows(
+      x0 = cc_source[,1],
+      y0 = cc_source[,2],
+      x1 = cc_image[,1],
+      y1 = cc_image[,2],
+      length = 0.075
+  )
+  legend("topleft", legend = c("Source points", "Image points"),
+         col = c("blue", "red"), pt.lwd = 1, bty = "n", cex = 0.8, pch = 1)
+}
+
+#' @export
+summary.distanamo_unipolar_displacement_result <- function(object, ...) {
+  if (!inherits(object, "distanamo_unipolar_displacement_result")) stop("Not a distanamo_unipolar_displacement_result object")
+  summary_obj <- list(
+    mean_displacement = mean(sf::st_distance(object$source_points, object$image_points, by_element = TRUE))
+  )
+  cat("Summary of the unipolar displacement result:\n")
+  cat("Mean displacement:", summary_obj$mean_displacement, paste0("[", units::deparse_unit(summary_obj$mean_displacement), "]"), "\n")
+  return(invisible(summary_obj))
+}
+
+#' @export
+plot.distanamo_unipolar_displacement_result <- function(x, ...) {
+  if (!inherits(x, "distanamo_unipolar_displacement_result")) stop("Not a distanamo_unipolar_displacement_result object")
+  plot(sf::st_geometry(x$source_points), col = "blue", main = "Source points to image points displacement")
+  plot(sf::st_geometry(x$image_points), col = "red", add = TRUE)
+  c_source <- sf::st_coordinates(x$source_points)
+  c_image <- sf::st_coordinates(x$image_points)
+  identical_pts <-identical(c_source, c_image)
+  cc_source <- c_source[!identical_pts,]
+  cc_image <- c_image[!identical_pts,]
+  arrows(
+    x0 = cc_source[,1],
+    y0 = cc_source[,2],
+    x1 = cc_image[,1],
+    y1 = cc_image[,2],
+    length = 0.075
+  )
+  legend("topleft", legend = c("Source points", "Image points"),
+         col = c("blue", "red"), pt.lwd = 1, bty = "n", cex = 0.8, pch = 1)
 }
 
 #' dc_create
@@ -132,14 +222,14 @@ plot.distanamo_interpolation_grid <- function(
 #'
 #' pts <- rbind(start, points[,-c(1:2)])
 #' durations <-  c(0, points$durations)
-#' pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
+#' pos_result <- dc_move_points(points = pts, times = durations, factor = 1)
 #'
 #' bbox <- dc_combine_bbox(list_layers = list(points, center))
 #'
 #' # Create the interpolation grid
 #' igrid <- dc_create(
-#'   source_points = pts,
-#'   image_points = pts_moved,
+#'   source_points = pos_result$source_points,
+#'   image_points = pos_result$image_points,
 #'   precision = 2,
 #'   bbox = bbox,
 #' )
@@ -228,14 +318,14 @@ dc_create <- function (
 #'
 #' pts <- rbind(start, points[,-c(1:2)])
 #' durations <-  c(0, points$durations)
-#' pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
+#' pos_result <- dc_move_points(points = pts, times = durations, factor = 1)
 #'
 #' bbox <- dc_combine_bbox(list_layers = list(points, center))
 #'
 #' # Create the interpolation grid
 #' igrid <- dc_create(
-#'   source_points = pts,
-#'   image_points = pts_moved,
+#'   source_points = pos_result$source_points,
+#'   image_points = pos_result$image_points,
 #'   precision = 2,
 #'   bbox = bbox,
 #' )
@@ -301,7 +391,7 @@ dc_combine_bbox <- function(list_layers) {
 #' the reference point should have a time of 0 and that times
 #' and points should be in the same order.
 #' @param factor The factor of displacement (default: 1)
-#' @return An sf object of moved points is returned.
+#' @return A list object with the source points and the image points
 #' @export
 #' @examples
 #' library(sf)
@@ -314,11 +404,11 @@ dc_combine_bbox <- function(list_layers) {
 #'
 #' pts <- rbind(start, points[,-c(1:2)])
 #' durations <-  c(0, points$durations)
-#' pts_moved <- dc_move_points(points = pts, times = durations, factor = 1)
+#' pos_result <- dc_move_points(points = pts, times = durations, factor = 1)
 #'
-#' plot(st_geometry(center))
-#' plot(st_geometry(pts), add = TRUE, pch = 4, cex = .5)
-#' plot(st_geometry(pts_moved), add = TRUE, pch = 4, cex = .5, col = "red")
+#' plot(st_geometry(pos_result$source_points), pch = 4, cex = .5)
+#' plot(st_geometry(pos_result$image_points), add = TRUE, pch = 4, cex = .5, col = "red")
+#' plot(st_geometry(center), add = TRUE)
 dc_move_points <- function(points, times, factor) {
   if (missing(factor)) {
     factor <- 1
@@ -336,29 +426,36 @@ dc_move_points <- function(points, times, factor) {
 
   layer <- sf::st_sf(points)
   sf::st_geometry(layer) <- sf::st_as_sfc(new_points)
-  return(sf::st_set_crs(layer, source_crs))
+  new_points <- sf::st_set_crs(layer, source_crs)
+  li <- list(
+    source_points = points,
+    image_points = new_points
+  )
+  class(li) <- "distanamo_unipolar_displacement_result"
+
+  return(li)
 }
 
 #' dc_generate_positions_from_durations
 #'
 #' Generate positions from durations matrix.
-#' TODO: Add documentation about what happens when this
-#' func is called and why its used.
 #' @param durations The durations matrix
 #' @param source_points The source points, an sf POINT object
-#' @return An sf POINT object is returned.
+#' @return A list object with the source points and the image points
 #' @export
 dc_generate_positions_from_durations <- function(durations, source_points) {
-  new_points <- .Call(
+  li <- .Call(
     savvy_generate_positions_from_durations_matrix__impl,
     sf::st_as_binary(sf::st_geometry(source_points)),
     as.matrix(durations)
   )
   source_crs <- sf::st_crs(source_points)
-
   layer <- sf::st_sf(source_points)
-  sf::st_geometry(layer) <- sf::st_as_sfc(new_points)
-  return(sf::st_set_crs(layer, source_crs))
+  sf::st_geometry(layer) <- sf::st_as_sfc(li$image_points)
+  li$source_points <- source_points
+  li$image_points <- sf::st_set_crs(layer, source_crs)
+  class(li) <- "distanamo_multipolar_displacement_result"
+  return(li)
 }
 
 #' .source_grid

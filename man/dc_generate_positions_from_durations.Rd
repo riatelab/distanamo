@@ -12,7 +12,7 @@ dc_generate_positions_from_durations(durations, source_points)
 \item{source_points}{The source points, an sf POINT object}
 }
 \value{
-An sf POINT object is returned.
+A list object with the source points and the image points
 }
 \description{
 Generate positions from durations matrix.

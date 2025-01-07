@@ -16,7 +16,7 @@ and points should be in the same order.}
 \item{factor}{The factor of displacement (default: 1)}
 }
 \value{
-An sf object of moved points is returned.
+A list object with the source points and the image points
 }
 \description{
 Move points.
