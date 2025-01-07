@@ -20,6 +20,8 @@ The package is not yet on CRAN or on R-universe.
 
 To use this package you need to provide two sets of homologous points : *source points* and *image points*.
 
+The relation between the source points and the image points must depend on the studied theme: positions in access time or estimated positions in spatial cognition for example.
+
 ```R
 # Read source points, image points and the background layer to deform
 source_pts <- sf::st_read('data-source-point.geojson')
@@ -45,7 +47,7 @@ plot(igrid)
 Optionally you can provide a layer of source points and matrix of duration between
 the points.
 
-This duration matrix will be used to extract the duration between a reference points
+This duration matrix will be used to extract the duration between a reference point
 and all the other points, allowing to use the `dc_move_from_reference_point` function to move closer / farther
 points from the reference point depending on if they can be reached faster or slower of
 the mean speed (between the reference point and all the others).
