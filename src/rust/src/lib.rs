@@ -132,6 +132,38 @@ impl InterpolationGrid {
         Ok(out_list.into())
     }
 
+    pub fn transform_layers_parallel(&self, background_layers: ListSexp) -> savvy::Result<Sexp> {
+        let background_layers = background_layers
+            .values_iter()
+            .map(|v| match v.into_typed() {
+                TypedSexp::List(l) => {
+                    l.values_iter()
+                        .map(|v| match v.into_typed() {
+                            TypedSexp::Raw(rv) => {
+                                let byte_vector = rv.iter().copied().collect::<Vec<_>>();
+                                let geom: geo_types::Geometry<f64> =
+                                    read_wkb(&byte_vector).unwrap().to_geometry();
+                                geom
+                            }
+                            _ => panic!("Unexpected input while reading geometries to transform"),
+                        })
+                        .collect::<Vec<_>>()
+                }
+                _ => panic!("Unexpected input while reading geometries to transform"),
+            })
+            .collect::<Vec<_>>();
+
+        let bg_transformed = self.inner.interpolate_layers_par(&background_layers)?;
+
+        let mut out_list = OwnedListSexp::new(bg_transformed.len(), true)?;
+        for (i, layer) in bg_transformed.iter().enumerate() {
+            let l = geoms_to_wkb_list(&layer)?;
+            out_list.set_value(i, l)?;
+        }
+
+        Ok(out_list.into())
+    }
+
     pub fn deformation_strength(&self) -> savvy::Result<Sexp> {
         self.inner.deformation_strength().try_into()
     }

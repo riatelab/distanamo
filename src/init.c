@@ -64,6 +64,11 @@ SEXP savvy_InterpolationGrid_transform_layer__impl(SEXP self__, SEXP c_arg__back
     return handle_result(res);
 }
 
+SEXP savvy_InterpolationGrid_transform_layers_parallel__impl(SEXP self__, SEXP c_arg__background_layers) {
+    SEXP res = savvy_InterpolationGrid_transform_layers_parallel__ffi(self__, c_arg__background_layers);
+    return handle_result(res);
+}
+
 SEXP savvy_InterpolationGrid_deformation_strength__impl(SEXP self__) {
     SEXP res = savvy_InterpolationGrid_deformation_strength__ffi(self__);
     return handle_result(res);
@@ -112,6 +117,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"savvy_InterpolationGrid_get_source_grid__impl", (DL_FUNC) &savvy_InterpolationGrid_get_source_grid__impl, 1},
     {"savvy_InterpolationGrid_get_interpolated_grid__impl", (DL_FUNC) &savvy_InterpolationGrid_get_interpolated_grid__impl, 1},
     {"savvy_InterpolationGrid_transform_layer__impl", (DL_FUNC) &savvy_InterpolationGrid_transform_layer__impl, 2},
+    {"savvy_InterpolationGrid_transform_layers_parallel__impl", (DL_FUNC) &savvy_InterpolationGrid_transform_layers_parallel__impl, 2},
     {"savvy_InterpolationGrid_deformation_strength__impl", (DL_FUNC) &savvy_InterpolationGrid_deformation_strength__impl, 1},
     {"savvy_InterpolationGrid_sum_squared_deformation_strength__impl", (DL_FUNC) &savvy_InterpolationGrid_sum_squared_deformation_strength__impl, 1},
     {"savvy_InterpolationGrid_resolution__impl", (DL_FUNC) &savvy_InterpolationGrid_resolution__impl, 1},
