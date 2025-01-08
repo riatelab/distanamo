@@ -2,6 +2,16 @@
 
 This package allows you to create distance cartograms (or distance anamorphoses, hence the name).
 
+This is done by extending (by interpolation) to the layer(s) of the study area (territorial divisions, network...) the
+local displacement between the source coordinates and the image coordinates, derived from the distances between each pair
+of homologous points (source / image points).
+
+Note that this package is more geared towards the creation of cartograms based on the bidimensional regression
+technique than specifically towards the study and comparison of two 2D configurations in order to assess
+their similarity (for this we recommend using the [BiDimRegression](https://cran.r-project.org/web/packages/BiDimRegression/index.html)
+package which is geared towards applying bidimensional regression in the area of psychological research, face research and comparison of 2D-data patterns in general).
+
+
 ## Installation
 
 You can install the development version of `distanamo` from GitHub with:
@@ -158,7 +168,15 @@ All credits for the contribution of the method goes to **Colette Cauvin** *(Thé
 - This method is also available as a **QGIS plugin** ([GitHub repository](https://github.com/mthh/QgisDistanceCartogramPlugin) / [QGIS plugin repository](https://plugins.qgis.org/plugins/dist_cartogram/)).
 
 - This R package is a wrapper around the Rust library [`distance-cartogram-rs`](https://github.com/mthh/distance-cartogram-rs)
-  which is well documented and can be used directly from Rust.
+  which can be used directly from Rust.
+
+## References
+
+- Cauvin, C. (2005). A systemic approach to transport accessibility. A methodology developed in Strasbourg: 1982-2002. Cybergeo: European Journal of Geography (DOI: [10.4000/cybergeo.3425](https://doi.org/10.4000/cybergeo.3425)).
+
+- Cauvin, C., Vuidel, G. (2009). Darcy 2.0 - Mode d'emploi (https://thema.univ-fcomte.fr/productions/software/darcy/download/me_darcy.pdf) (in French).
+
+- Tobler, W. R. (1994). Bidimensional regression. Geographical Analysis, 26(3), 187-212.
 
 ## License
 
