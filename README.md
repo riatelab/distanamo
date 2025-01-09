@@ -2,14 +2,25 @@
 
 This package allows you to create distance cartograms (or distance anamorphoses, hence the name).
 
+Distance cartograms are a type of cartogram that deforms the layers of a map according to the distances
+between a set of source points and a set of image points.
+
 This is done by extending (by interpolation) to the layer(s) of the study area (territorial divisions, network...) the
 local displacement between the source coordinates and the image coordinates, derived from the distances between each pair
 of homologous points (source / image points).
 
+The relation between the source points and the image points, and thus the relative position of the image points compared
+to the source points, must depend on the studied theme (such as positions in access time for which this package provides
+some helper functions to generate the image points from the durations between the points).
+
 Note that this package is more geared towards the creation of cartograms based on the bidimensional regression
-technique than specifically towards the study and comparison of two 2D configurations in order to assess
-their similarity (for this we recommend using the [BiDimRegression](https://cran.r-project.org/web/packages/BiDimRegression/index.html)
-package which is geared towards applying bidimensional regression in the area of psychological research, face research and comparison of 2D-data patterns in general).
+technique than specifically towards the study and comparison of two 2D configurations in order to assess their
+similarity. For this we recommend using the [BiDimRegression](https://cran.r-project.org/web/packages/BiDimRegression/index.html)
+package which is geared towards applying bidimensional regression in the area of psychological research, face research
+and comparison of 2D-data patterns in general.
+Other functionalities close to those proposed in this package (in particular concerning multidimensional scaling
+and the rotation/scaling/translating/reflection of one set of points to fit another) can also be found in the
+[Vegan](https://cran.r-project.org/web/packages/vegan/index.html) package for example.
 
 
 ## Installation
@@ -29,8 +40,7 @@ The package is not yet on CRAN or on R-universe.
 ## Usage
 
 To use this package you need to provide two sets of homologous points : *source points* and *image points*.
-
-The relation between the source points and the image points must depend on the studied theme: positions in access time or estimated positions in spatial cognition for example.
+They are used to create an interpolation grid that will be used to deform the layer(s) of interest.
 
 ```R
 # Read source points, image points and the background layer to deform
@@ -68,7 +78,7 @@ source_pts <- sf::st_read('data-source-point.geojson')
 background_layer <- sf::st_read('background.geojson')
 bbox <- sf::st_bbox(background_layer)
 
-# Read duration between points
+# Read durations between points
 d <-read.csv('mat.csv', row.names = 1)
 
 # The CSV is a time matrix structured as follow
@@ -123,7 +133,7 @@ and can be used to create the interpolation grid).
 source_pts <- sf::st_read('data-source-point.geojson')
 background_layer <- sf::st_read('background.geojson')
 
-# Read duration between points
+# Read durations between points
 d <-read.csv('mat.csv', row.names = 1)
 # The CSV is a time matrix structured as follow
 #           AGEN   BORDEAUX   GRENOBLE etc.
@@ -155,12 +165,24 @@ deformed_background <- dc_interpolate(igrid, background_layer)
 plot(sf::st_geometry(deformed_background))
 ```
 
+### Deforming multiple layers at once
+
+If you want to deform multiple layers in parallel with an interpolation grid, you can use the `dc_interpolate_parallel`
+function.
+
+```R
+result_layers <- dc_interpolate_parallel(
+  igrid,
+  list(layer1, layer2, layer3)
+)
+```
+
 ## Example
 
 ![Example of distance cartogram](./man/figures/ex-1.png)
 *Map made with [`mapsf`](https://github.com/riatelab/mapsf).*
 
-## More information about the method
+## More information about the origin of the method
 
 - This is a port of the **[Darcy](https://thema.univ-fcomte.fr/productions/software/darcy/)** standalone software regarding the bidimensional regression and the backgrounds layers deformation.  
 All credits for the contribution of the method goes to **Colette Cauvin** *(Théma - Univ. Franche-Comté)* and for the reference Java implementation goes to **Gilles Vuidel** *(Théma - Univ. Franche-Comté)*.
