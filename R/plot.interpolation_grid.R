@@ -30,16 +30,7 @@ plot.distanamo_interpolation_grid <- function(
       c_interpolated <- sf::st_coordinates(x$interpolated_points)
       # We dont want to draw arrows if the point in c_image is the same
       # as the point in c_interpolated
-      identical_pts <-identical(c_image, c_interpolated)
-      cc_image <- c_image[!identical_pts,]
-      cc_interpolated <- c_interpolated[!identical_pts,]
-      arrows(
-        x0 = cc_image[,1],
-        y0 = cc_image[,2],
-        x1 = cc_interpolated[,1],
-        y1 = cc_interpolated[,2],
-        length = 0.075
-      )
+      better_arrow(c_image, c_interpolated)
       legend("topleft", legend = c("Image points", "Interpolated points"),
              col = c("blue", "red"), pt.lwd = 1, bty = "n", cex = 0.8, pch = 1)
     }
