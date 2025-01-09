@@ -1,3 +1,5 @@
+#' @importFrom grDevices devAskNewPage
+#' @importFrom graphics arrows legend
 #' @export
 plot.distanamo_interpolation_grid <- function(
   x,

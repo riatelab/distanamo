@@ -24,7 +24,10 @@ BugReports: https://github.com/riatelab/distanamo/issues/
 Depends: 
     R (>= 3.6.0)
 Imports:
-    sf
+    sf, 
+    units, 
+    graphics, 
+    grDevices
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
