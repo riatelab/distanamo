@@ -15,12 +15,12 @@ some helper functions to generate the image points from the durations between th
 
 Note that this package is more geared towards the creation of cartograms based on the bidimensional regression
 technique than specifically towards the study and comparison of two 2D configurations in order to assess their
-similarity. For this we recommend using the [BiDimRegression](https://cran.r-project.org/web/packages/BiDimRegression/index.html)
+similarity. For this we recommend using the [BiDimRegression](https://CRAN.R-project.org/package=BiDimRegression)
 package which is geared towards applying bidimensional regression in the area of psychological research, face research
 and comparison of 2D-data patterns in general.
 Other functionalities close to those proposed in this package (in particular concerning multidimensional scaling
 and the rotation/scaling/translating/reflection of one set of points to fit another) can also be found in the
-[Vegan](https://cran.r-project.org/web/packages/vegan/index.html) package for example.
+[Vegan](https://CRAN.R-project.org/package=vegan) package for example.
 
 
 ## Installation
