@@ -71,7 +71,7 @@ dc_move_from_reference_point <- function(reference_point, other_points, duration
     source_points = points,
     image_points = new_points
   )
-  class(li) <- "distanamo_unipolar_displacement_result"
+  class(li) <- "unipolar_displacement_result"
 
   return(li)
 }

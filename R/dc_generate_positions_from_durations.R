@@ -19,6 +19,6 @@ dc_generate_positions_from_durations <- function(durations, source_points) {
   sf::st_geometry(layer) <- sf::st_as_sfc(li$image_points)
   li$source_points <- source_points
   li$image_points <- sf::st_set_crs(layer, source_crs)
-  class(li) <- "distanamo_multipolar_displacement_result"
+  class(li) <- "multipolar_displacement_result"
   return(li)
 }

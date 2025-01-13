@@ -124,7 +124,7 @@ dc_create <- function (
   e$resolution <- .Call(savvy_InterpolationGrid_resolution__impl, e$.ptr)
   e$bbox <- .Call(savvy_InterpolationGrid_bbox__impl, e$.ptr)
   names(e$bbox) <- c('xmin', 'ymin', 'xmax', 'ymax')
-  class(e) <- "distanamo_interpolation_grid"
+  class(e) <- "interpolation_grid"
   return(e)
 }
 

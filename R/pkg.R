@@ -15,31 +15,31 @@
 NULL
 
 #' @export
-`$<-.distanamo_interpolation_grid` <- function(x, name, value) {
+`$<-.interpolation_grid` <- function(x, name, value) {
   stop("distanamo_interpolation_grid cannot be modified", call. = FALSE)
 }
 
 #' @export
-`[[<-.distanamo_interpolation_grid` <- function(x, i, value) {
+`[[<-.interpolation_grid` <- function(x, i, value) {
   stop("distanamo_interpolation_grid cannot be modified", call. = FALSE)
 }
 
 #' @export
-`$<-.distanamo_multipolar_displacement_result` <- function(x, name, value) {
+`$<-.multipolar_displacement_result` <- function(x, name, value) {
   stop("distanamo_multipolar_displacement_result cannot be modified", call. = FALSE)
 }
 
 #' @export
-`[[<-.distanamo_multipolar_displacement_result` <- function(x, i, value) {
+`[[<-.multipolar_displacement_result` <- function(x, i, value) {
   stop("distanamo_multipolar_displacement_result cannot be modified", call. = FALSE)
 }
 
 #' @export
-`$<-.distanamo_unipolar_displacement_result` <- function(x, name, value) {
+`$<-.unipolar_displacement_result` <- function(x, name, value) {
   stop("distanamo_unipolar_displacement_result cannot be modified", call. = FALSE)
 }
 
 #' @export
-`[[<-.distanamo_unipolar_displacement_result` <- function(x, i, value) {
+`[[<-.unipolar_displacement_result` <- function(x, i, value) {
   stop("distanamo_unipolar_displacement_result cannot be modified", call. = FALSE)
 }
