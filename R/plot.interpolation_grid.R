@@ -1,14 +1,14 @@
 #' @importFrom grDevices devAskNewPage
 #' @importFrom graphics arrows legend
 #' @export
-plot.distanamo_interpolation_grid <- function(
+plot.interpolation_grid <- function(
   x,
   which = 1:3,
   ask = interactive(),
   caption = list("Source grid", "Interpolated grid", "Image to interpolated points"),
   ...
 ) {
-  if (!inherits(x, "distanamo_interpolation_grid")) stop("Not a distanamo_interpolation_grid object")
+  if (!inherits(x, "interpolation_grid")) stop("Not a interpolation_grid object")
   if (!is.numeric(which) || any(which < 1) || any(which > 3)) stop("'which' must be in 1:3")
 
   if (ask) {

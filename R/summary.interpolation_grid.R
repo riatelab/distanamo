@@ -1,6 +1,6 @@
 #' @export
-summary.distanamo_interpolation_grid <- function(object, ...) {
-  if (!inherits(object, "distanamo_interpolation_grid")) stop("Not a distanamo_interpolation_grid object")
+summary.interpolation_grid <- function(object, ...) {
+  if (!inherits(object, "interpolation_grid")) stop("Not a interpolation_grid object")
   summary_obj <- list(
     deformation_strength = .Call(savvy_InterpolationGrid_deformation_strength__impl, object$.ptr),
     mae = .Call(savvy_InterpolationGrid_mae__impl, object$.ptr),

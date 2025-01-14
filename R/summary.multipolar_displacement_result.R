@@ -1,6 +1,6 @@
 #' @export
-summary.distanamo_multipolar_displacement_result <- function(object, ...) {
-  if (!inherits(object, "distanamo_multipolar_displacement_result")) stop("Not a distanamo_multipolar_displacement_result object")
+summary.multipolar_displacement_result <- function(object, ...) {
+  if (!inherits(object, "multipolar_displacement_result")) stop("Not a multipolar_displacement_result object")
   dists <- sf::st_distance(object$source_points, object$image_points, by_element = TRUE)
   summary_obj <- list(
     error = object$error,

@@ -1,6 +1,6 @@
 #' @export
-plot.distanamo_multipolar_displacement_result <- function(x, ...) {
-  if (!inherits(x, "distanamo_multipolar_displacement_result")) stop("Not a distanamo_multipolar_displacement_result object")
+plot.multipolar_displacement_result <- function(x, ...) {
+  if (!inherits(x, "multipolar_displacement_result")) stop("Not a multipolar_displacement_result object")
   plot(sf::st_geometry(x$source_points), col = "blue", main = "Source points to image points displacement")
   plot(sf::st_geometry(x$image_points), col = "red", add = TRUE)
   c_source <- sf::st_coordinates(x$source_points)
