@@ -1,5 +1,5 @@
 SEXP savvy_move_points_from_durations__ffi(SEXP c_arg__points, SEXP c_arg__durations, SEXP c_arg__factor);
-SEXP savvy_generate_positions_from_durations_matrix__ffi(SEXP c_arg__points, SEXP c_arg__durations);
+SEXP savvy_generate_positions_from_durations_matrix__ffi(SEXP c_arg__points, SEXP c_arg__durations, SEXP c_arg__adjustment_type);
 
 // methods and associated functions for InterpolationGrid
 SEXP savvy_InterpolationGrid_new__ffi(SEXP c_arg__source_points, SEXP c_arg__image_points, SEXP c_arg__precision, SEXP c_arg__n_iter, SEXP c_arg__bbox);

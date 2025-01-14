@@ -9,7 +9,6 @@ summary.distanamo_multipolar_displacement_result <- function(object, ...) {
     max_displacement = max(dists)
   )
   cat("Summary of the multipolar displacement result:\n")
-  cat("Error (procrustes distance):", summary_obj$error, "\n")
   cat("Min displacement:", summary_obj$min_displacement, paste0("[", units::deparse_unit(summary_obj$min_displacement), "]"), "\n")
   cat("Mean displacement:", summary_obj$mean_displacement, paste0("[", units::deparse_unit(summary_obj$mean_displacement), "]"), "\n")
   cat("Max displacement:", summary_obj$max_displacement, paste0("[", units::deparse_unit(summary_obj$max_displacement), "]"), "\n")

@@ -1,5 +1,5 @@
 use distance_cartogram::{
-    generate_positions_from_durations, move_points, CentralTendency, Grid, GridType,
+    adjustment, generate_positions_from_durations, move_points, CentralTendency, Grid, GridType,
 };
 use geo_traits::to_geo::ToGeoGeometry;
 use geo_types::Coord;
@@ -143,19 +143,18 @@ impl InterpolationGrid {
         let background_layers = background_layers
             .values_iter()
             .map(|v| match v.into_typed() {
-                TypedSexp::List(l) => {
-                    l.values_iter()
-                        .map(|v| match v.into_typed() {
-                            TypedSexp::Raw(rv) => {
-                                let byte_vector = rv.iter().copied().collect::<Vec<_>>();
-                                let geom: geo_types::Geometry<f64> =
-                                    read_wkb(&byte_vector).unwrap().to_geometry();
-                                geom
-                            }
-                            _ => panic!("Unexpected input while reading geometries to transform"),
-                        })
-                        .collect::<Vec<_>>()
-                }
+                TypedSexp::List(l) => l
+                    .values_iter()
+                    .map(|v| match v.into_typed() {
+                        TypedSexp::Raw(rv) => {
+                            let byte_vector = rv.iter().copied().collect::<Vec<_>>();
+                            let geom: geo_types::Geometry<f64> =
+                                read_wkb(&byte_vector).unwrap().to_geometry();
+                            geom
+                        }
+                        _ => panic!("Unexpected input while reading geometries to transform"),
+                    })
+                    .collect::<Vec<_>>(),
                 _ => panic!("Unexpected input while reading geometries to transform"),
             })
             .collect::<Vec<_>>();
@@ -164,7 +163,7 @@ impl InterpolationGrid {
 
         let mut out_list = OwnedListSexp::new(bg_transformed.len(), true)?;
         for (i, layer) in bg_transformed.iter().enumerate() {
-            let l = geoms_to_wkb_list(&layer)?;
+            let l = geoms_to_wkb_list(layer)?;
             out_list.set_value(i, l)?;
         }
 
@@ -233,6 +232,7 @@ fn move_points_from_durations(
 fn generate_positions_from_durations_matrix(
     points: ListSexp,
     durations: RealSexp,
+    adjustment_type: NumericScalar,
 ) -> savvy::Result<Sexp> {
     let points = convert_wkb_point_to_coords(points)?;
 
@@ -254,6 +254,12 @@ fn generate_positions_from_durations_matrix(
         ));
     };
 
+    let adjustment_type = match adjustment_type.as_usize()? {
+        0 => adjustment::AdjustmentType::Affine,
+        1 => adjustment::AdjustmentType::Euclidean,
+        _ => return Err(savvy_err!("Invalid adjustment type")),
+    };
+
     // We need to convert the duration matrix (which is column-major)
     // to a row-major Vec of Vecs
     let durations = durations.as_slice();
@@ -266,14 +272,52 @@ fn generate_positions_from_durations_matrix(
         durations_matrix.push(row);
     }
 
-    let positioning_result = generate_positions_from_durations(durations_matrix, &points)?;
+    let mds_result = generate_positions_from_durations(durations_matrix)?;
 
-    let mut out_list = OwnedListSexp::new(2, true)?;
+    let pos_result = adjustment::adjust(&points, &mds_result, adjustment_type)?;
 
-    let points = geoms_to_wkb_list(&coords_to_points(&positioning_result.points))?;
+    let mut out_list = OwnedListSexp::new(10, true)?;
+
+    let points = geoms_to_wkb_list(&coords_to_points(&pos_result.points_adjusted))?;
 
     out_list.set_name_and_value(0, "image_points", points)?;
-    out_list.set_name_and_value::<Sexp>(1, "error", positioning_result.error.try_into()?)?;
+    out_list.set_name_and_value::<Sexp>(
+        1,
+        "a11",
+        pos_result.transformation_matrix.a11.try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(
+        2,
+        "a12",
+        pos_result.transformation_matrix.a12.try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(
+        3,
+        "a13",
+        pos_result.transformation_matrix.a13.try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(
+        4,
+        "a21",
+        pos_result.transformation_matrix.a21.try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(
+        5,
+        "a22",
+        pos_result.transformation_matrix.a22.try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(
+        6,
+        "a23",
+        pos_result.transformation_matrix.a23.try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(
+        7,
+        "adjustment_type",
+        format!("{:?}", adjustment_type).try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(8, "scale", pos_result.scale.try_into()?)?;
+    out_list.set_name_and_value::<Sexp>(9, "angle", pos_result.angle.try_into()?)?;
 
     Ok(out_list.into())
 }

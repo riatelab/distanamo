@@ -4,12 +4,18 @@
 \alias{dc_generate_positions_from_durations}
 \title{dc_generate_positions_from_durations}
 \usage{
-dc_generate_positions_from_durations(durations, source_points)
+dc_generate_positions_from_durations(
+  durations,
+  source_points,
+  adjustment_type = "euclidean"
+)
 }
 \arguments{
 \item{durations}{The durations matrix}
 
 \item{source_points}{The source points, an sf POINT object}
+
+\item{adjustment_type}{The adjustment type to use, either "euclidean" or "affine"}
 }
 \value{
 A list object with the source points and the image points, ready
