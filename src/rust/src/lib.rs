@@ -192,8 +192,16 @@ impl InterpolationGrid {
         self.inner.mae().try_into()
     }
 
-    pub fn rmse(&self) -> savvy::Result<Sexp> {
-        self.inner.rmse().try_into()
+    pub fn rmse_interp_image(&self) -> savvy::Result<Sexp> {
+        let rmse = self.inner.rmse_interp_image();
+        let res = vec![rmse.rmse, rmse.rmse_x, rmse.rmse_y];
+        res.try_into()
+    }
+
+    pub fn rmse_interp_source(&self) -> savvy::Result<Sexp> {
+        let rmse = self.inner.rmse_interp_source();
+        let res = vec![rmse.rmse, rmse.rmse_x, rmse.rmse_y];
+        res.try_into()
     }
 
     pub fn r_squared(&self) -> savvy::Result<Sexp> {
@@ -276,7 +284,7 @@ fn generate_positions_from_durations_matrix(
 
     let pos_result = adjustment::adjust(&points, &mds_result, adjustment_type)?;
 
-    let mut out_list = OwnedListSexp::new(10, true)?;
+    let mut out_list = OwnedListSexp::new(13, true)?;
 
     let points = geoms_to_wkb_list(&coords_to_points(&pos_result.points_adjusted))?;
 
@@ -318,6 +326,9 @@ fn generate_positions_from_durations_matrix(
     )?;
     out_list.set_name_and_value::<Sexp>(8, "scale", pos_result.scale.try_into()?)?;
     out_list.set_name_and_value::<Sexp>(9, "angle", pos_result.angle.try_into()?)?;
+    out_list.set_name_and_value::<Sexp>(10, "rmse", pos_result.rmse.try_into()?)?;
+    out_list.set_name_and_value::<Sexp>(11, "rmse_x", pos_result.rmse_x.try_into()?)?;
+    out_list.set_name_and_value::<Sexp>(12, "rmse_y", pos_result.rmse_y.try_into()?)?;
 
     Ok(out_list.into())
 }

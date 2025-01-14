@@ -94,8 +94,13 @@ SEXP savvy_InterpolationGrid_mae__impl(SEXP self__) {
     return handle_result(res);
 }
 
-SEXP savvy_InterpolationGrid_rmse__impl(SEXP self__) {
-    SEXP res = savvy_InterpolationGrid_rmse__ffi(self__);
+SEXP savvy_InterpolationGrid_rmse_interp_image__impl(SEXP self__) {
+    SEXP res = savvy_InterpolationGrid_rmse_interp_image__ffi(self__);
+    return handle_result(res);
+}
+
+SEXP savvy_InterpolationGrid_rmse_interp_source__impl(SEXP self__) {
+    SEXP res = savvy_InterpolationGrid_rmse_interp_source__ffi(self__);
     return handle_result(res);
 }
 
@@ -123,7 +128,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"savvy_InterpolationGrid_resolution__impl", (DL_FUNC) &savvy_InterpolationGrid_resolution__impl, 1},
     {"savvy_InterpolationGrid_bbox__impl", (DL_FUNC) &savvy_InterpolationGrid_bbox__impl, 1},
     {"savvy_InterpolationGrid_mae__impl", (DL_FUNC) &savvy_InterpolationGrid_mae__impl, 1},
-    {"savvy_InterpolationGrid_rmse__impl", (DL_FUNC) &savvy_InterpolationGrid_rmse__impl, 1},
+    {"savvy_InterpolationGrid_rmse_interp_image__impl", (DL_FUNC) &savvy_InterpolationGrid_rmse_interp_image__impl, 1},
+    {"savvy_InterpolationGrid_rmse_interp_source__impl", (DL_FUNC) &savvy_InterpolationGrid_rmse_interp_source__impl, 1},
     {"savvy_InterpolationGrid_r_squared__impl", (DL_FUNC) &savvy_InterpolationGrid_r_squared__impl, 1},
     {"savvy_InterpolationGrid_interpolated_points__impl", (DL_FUNC) &savvy_InterpolationGrid_interpolated_points__impl, 1},
     {NULL, NULL, 0}
