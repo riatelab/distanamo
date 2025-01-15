@@ -42,8 +42,7 @@ plot.interpolation_grid <- function(
       raster_resampled <- terra::resample(raster, t_raster, method = "cubicspline")
       pal <- get_continuous_pal(
         c(min(mat), 1, max(mat)),
-        c("#4575b4", "#ffffbf", "#a50026"),
-        1
+        c("#4575b4", "#ffffbf", "#a50026")
       )
       terra::plot(raster_resampled, main = caption[4], col = pal)
     }
@@ -54,32 +53,10 @@ plot.interpolation_grid <- function(
   for (i in which) plots[[plot_names[i]]]()
 }
 
-#' Code from https://github.com/riatelab/mapsf/blob/dev/R/mf_map_utils.R
-get_hex_pal <- function(pal, alpha) {
-  pal <- grDevices::col2rgb(pal, alpha = FALSE)
-  ffun <- function(x) {
-    grDevices::rgb(pal[1, x],
-                   pal[2, x],
-                   pal[3, x],
-                   maxColorValue = 255
-    )
-  }
-  paste0(sapply(seq_len(ncol(pal)), ffun), get_alpha(alpha))
-}
-
-#' Code from https://github.com/riatelab/mapsf/blob/dev/R/mf_map_utils.R
-get_alpha <- function(alpha) {
-  if (alpha < 0) {
-    alpha <- 0
-  }
-  if (alpha > 1) {
-    alpha <- 1
-  }
-  sprintf("%02X", as.integer(255.999 * alpha))
-}
-
-#' Code from https://github.com/riatelab/mapsf/blob/dev/R/mf_raster_utils.R
-get_continuous_pal <- function(breaks, pal, alpha) {
+#' Code copied and slightly adapted (to remove support for customizing alpha channel)
+#' from https://github.com/riatelab/mapsf/blob/dev/R/mf_raster_utils.R
+#' @noRd
+get_continuous_pal <- function(breaks, pal) {
   etendu <- max(breaks) - min(breaks)
   lb <- length(breaks)
   dd <- data.frame(from = breaks[1:(lb - 1)], to = breaks[2:lb])
@@ -92,8 +69,5 @@ get_continuous_pal <- function(breaks, pal, alpha) {
     l[[i]] <- colorRampPalette(c(dd$colfrom[i], dd$colto[i]), alpha = TRUE)(dd$ncol[i])
   }
   p <- do.call(c, l)
-  if (!is.null(alpha)) {
-    p <- get_hex_pal(p, alpha)
-  }
-  p
+  return(p)
 }
