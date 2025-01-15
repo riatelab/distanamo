@@ -16,3 +16,4 @@ SEXP savvy_InterpolationGrid_rmse_interp_image__ffi(SEXP self__);
 SEXP savvy_InterpolationGrid_rmse_interp_source__ffi(SEXP self__);
 SEXP savvy_InterpolationGrid_r_squared__ffi(SEXP self__);
 SEXP savvy_InterpolationGrid_interpolated_points__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_get_deformation_data__ffi(SEXP self__);

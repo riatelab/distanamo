@@ -4,8 +4,8 @@ use distance_cartogram::{
 use geo_traits::to_geo::ToGeoGeometry;
 use geo_types::Coord;
 use savvy::{
-    savvy, savvy_err, ListSexp, NumericScalar, OwnedListSexp, OwnedRawSexp, RealSexp, Sexp,
-    TypedSexp,
+    savvy, savvy_err, ListSexp, NumericScalar, OwnedListSexp, OwnedRawSexp, OwnedRealSexp,
+    RealSexp, Sexp, TypedSexp,
 };
 use wkb::reader::read_wkb;
 use wkb::writer::write_geometry;
@@ -212,6 +212,21 @@ impl InterpolationGrid {
         let points = coords_to_points(self.inner.interpolated_points());
         let out_list = geoms_to_wkb_list(&points)?;
         Ok(out_list.into())
+    }
+
+    pub fn get_deformation_data(&self) -> savvy::Result<Sexp> {
+        let (width, height) = self.inner.grid_dimensions();
+        let mut buf = Vec::with_capacity(width * height);
+        for i in 0..height {
+            for j in 0..width {
+                buf.push(self.inner.node_deformation_strength(i, j));
+            }
+        }
+
+        let mut out = OwnedRealSexp::try_from(buf.as_slice())?;
+
+        out.set_dim(&[height as i32, width as i32])?;
+        Ok(out.into())
     }
 }
 
