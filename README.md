@@ -39,6 +39,8 @@ The package is not yet on CRAN or on R-universe.
 
 ## Usage
 
+### Basics
+
 To use this package you need to provide two sets of homologous points : *source points* and *image points*.
 They are used to create an interpolation grid that will be used to deform the layer(s) of interest.
 
@@ -62,6 +64,17 @@ summary(igrid)
 plot(igrid)
 ```
 
+### Adjusting the image points to the source points
+
+In some cases, you may want to adjust the image points to the source points using an affine or a Euclidean transformation:
+
+```R
+# TODO
+```
+
+This is also what is done internally when using the `dc_generate_positions_from_durations` function (see below)
+after it has performed a Principal Coordinates Analysis (PCoA) on the duration matrix.
+
 ### Generating image points from a reference point and durations from the reference point to all the other points
 
 Optionally you can provide a layer of source points and matrix of duration between
@@ -71,6 +84,9 @@ This duration matrix will be used to extract the duration between a reference po
 and all the other points, allowing to use the `dc_move_from_reference_point` function to move closer / farther
 points from the reference point depending on if they can be reached faster or slower of
 the mean speed (between the reference point and all the others).
+
+The cartogram obtained by this method qualifies the *unipolar accessibility* of a location
+(the reference point used in the `dc_move_from_reference_point` function).
 
 ```R
 # Read source points and layer to be deformed
@@ -119,6 +135,12 @@ deformed_background <- dc_interpolate(igrid, background_layer)
 plot(sf::st_geometry(deformed_background))
 ```
 
+A popular way of representing this type of cartogram is to add concentric circles (separated by a constant time) around the reference point.
+
+```R
+# TODO: show how to create concentric circles from the reference point and the durations
+```
+
 ### Generating image points from a durations matrix between all the points
 
 Optionally you can provide a matrix of durations between all the points as well as the positions of the source points and use the
@@ -126,6 +148,9 @@ Optionally you can provide a matrix of durations between all the points as well 
 
 This function will perform Principal Coordinates Analysis (PCoA, a form a Multidimensional scaling) on the duration matrix to generate the positions of the points in a 2D space.
 It will then adjust these points (using an affine or a Euclidean transformation) to the source points to generate the final image points that can be used to create the interpolation grid.
+
+The cartogram obtained by this method qualifies the *global accessibility* (or the *multipolar accessibility*)
+of a territory.
 
 ```R
 # Read source points and layer to be deformed
@@ -181,23 +206,45 @@ result_layers <- dc_interpolate_parallel(
 ![Example of distance cartogram](./man/figures/ex-1.png)
 *Map made with [`mapsf`](https://github.com/riatelab/mapsf).*
 
+
 ## More information about the origin of the method
 
 - This is a port of the **[Darcy](https://thema.univ-fcomte.fr/productions/software/darcy/)** standalone software regarding the bidimensional regression and the backgrounds layers deformation.  
-All credits for the contribution of the method goes to **Colette Cauvin** *(Théma - Univ. Franche-Comté)* and for the reference Java implementation goes to **Gilles Vuidel** *(Théma - Univ. Franche-Comté)*.
+All credit for the contribution of the method goes to **Colette Cauvin** *(Théma - Univ. Franche-Comté)* and for the reference Java implementation goes to **Gilles Vuidel** *(Théma - Univ. Franche-Comté)*.
 
 - This method is also available as a **QGIS plugin** ([GitHub repository](https://github.com/mthh/QgisDistanceCartogramPlugin) / [QGIS plugin repository](https://plugins.qgis.org/plugins/dist_cartogram/)).
 
 - This R package is a wrapper around the Rust library [`distance-cartogram-rs`](https://github.com/mthh/distance-cartogram-rs)
   which can be used directly from Rust.
 
+
 ## References
 
-- Cauvin, C. (2005). A systemic approach to transport accessibility. A methodology developed in Strasbourg: 1982-2002. Cybergeo: European Journal of Geography (DOI: [10.4000/cybergeo.3425](https://doi.org/10.4000/cybergeo.3425)).
+### About the method
 
-- Cauvin, C., Vuidel, G. (2009). Darcy 2.0 - Mode d'emploi (https://thema.univ-fcomte.fr/productions/software/darcy/download/me_darcy.pdf) (in French).
+- Cauvin, C. (2005). A systemic approach to transport accessibility. A methodology developed in Strasbourg: 1982-2002. Cybergeo: European Journal of Geography. DOI: [10.4000/cybergeo.3425](https://doi.org/10.4000/cybergeo.3425).
 
-- Tobler, W. R. (1994). Bidimensional regression. Geographical Analysis, 26(3), 187-212.
+- Cauvin, C., & Vuidel, G. (2009). Darcy 2.0 - Mode d'emploi (https://thema.univ-fcomte.fr/productions/software/darcy/download/me_darcy.pdf).
+
+- Tobler, W. R. (1994). Bidimensional regression. Geographical Analysis, 26(3), 187-212. DOI: [10.1111/j.1538-4632.1994.tb00320.x](https://doi.org/10.1111/j.1538-4632.1994.tb00320.x)
+
+- Bronner, A. C. (2023).  Cartogrammes, anamorphoses : des territoires transformés. In Traitements et cartographie de l’information géographique, ISTE Group (pp.231-271). DOI: [10.51926/ISTE.9161.ch7](https://doi.org/10.51926/ISTE.9161.ch7).
+
+
+### About distance (or time) cartograms in general: their usability, the other methods to create them, etc.
+
+- Ullah, R., Mengistu, E., van Elzakker, C. & Kraak, M. (2016). Usability evaluation of centered time cartograms. Open Geosciences, 8(1), 337-359. DOI: [10.1515/geo-2016-0035](https://doi.org/10.1515/geo-2016-0035).
+
+- Hong, S., Kim, Y. S., Yoon, J. C., & Aragon, C. (2014). Traffigram: distortion for clarification via isochronal cartography. In Proceedings of the SIGCHI Conference on Human Factors in Computing Systems (pp. 907–916). Association for Computing Machinery. DOI: [10.1145/2556288.2557224](https://doi.org/10.1145/2556288.2557224).
+
+- Ullah, R., Kraak, M. J., & Van Elzakker, C. (2013). Using cartograms to explore temporal data: do they work. GeoViz, 2013.
+
+- Ullah, R., & Kraak, M. J. (2014). An alternative method to constructing time cartograms for the visual representation of scheduled movement data. Journal of Maps, 11(4), 674–687. DOI: [10.1080/17445647.2014.935502](https://doi.org/10.1080/17445647.2014.935502).
+
+- Hong, S., Kocielnik, R., Min-Joon Yoo, Battersby, S., Juho Kim, & Aragon, C. (2017). Designing interactive distance cartograms to support urban travelers. In 2017 IEEE Pacific Visualization Symposium (PacificVis) (pp. 81-90).
+
+- Shimizu, E. and Inoue, R. (2009). A new algorithm for distance cartogram construction. International Journal of Geographical Information Science 23(11): 1453-1470. DOI: [10.1080/13658810802186882](https://doi.org/10.1080/13658810802186882).
+
 
 ## License
 
