@@ -238,16 +238,18 @@ fn move_points_from_durations(
 ) -> savvy::Result<Sexp> {
     let points = convert_wkb_point_to_coords(points)?;
 
-    let new_points = move_points(
+    let pos_result = move_points(
         &points,
         durations.as_slice(),
         factor.as_f64(),
         CentralTendency::Mean,
     )?;
 
-    let new_points = coords_to_points(&new_points);
-    let out_list = geoms_to_wkb_list(&new_points)?;
+    let points = geoms_to_wkb_list(&coords_to_points(&pos_result.points))?;
 
+    let mut out_list = OwnedListSexp::new(2, true)?;
+    out_list.set_name_and_value(0, "image_points", points)?;
+    out_list.set_name_and_value::<Sexp>(1, "reference_speed", pos_result.reference_speed.try_into()?)?;
     Ok(out_list.into())
 }
 

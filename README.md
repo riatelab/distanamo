@@ -138,7 +138,10 @@ plot(sf::st_geometry(deformed_background))
 A popular way of representing this type of cartogram is to add concentric circles (separated by a constant time) around the reference point.
 
 ```R
-# TODO: show how to create concentric circles from the reference point and the durations
+circles <- dc_concentric_circle(
+  pos_result,
+  steps = list(10, 20, 30, 40, 50, 60)
+)
 ```
 
 ### Generating image points from a durations matrix between all the points

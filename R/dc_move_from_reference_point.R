@@ -54,7 +54,7 @@ dc_move_from_reference_point <- function(reference_point, other_points, duration
 
   durations <- c(0, other_points[[duration_col_name]])
 
-  new_points <- .Call(
+  pos_res <- .Call(
     savvy_move_points_from_durations__impl,
     sf::st_as_binary(sf::st_geometry(points)),
     durations,
@@ -64,12 +64,13 @@ dc_move_from_reference_point <- function(reference_point, other_points, duration
   source_crs <- sf::st_crs(points)
 
   layer <- sf::st_sf(points)
-  sf::st_geometry(layer) <- sf::st_as_sfc(new_points)
-  new_points <- sf::st_set_crs(layer, source_crs)
+  sf::st_geometry(layer) <- sf::st_as_sfc(pos_res$image_points)
+  pos_res$image_points <- sf::st_set_crs(layer, source_crs)
   li <- list(
     reference_point = reference_point,
     source_points = points,
-    image_points = new_points
+    image_points = pos_res$image_points,
+    reference_speed = pos_res$reference_speed
   )
   class(li) <- "unipolar_displacement_result"
 
