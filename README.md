@@ -1,4 +1,4 @@
-# Distanamo
+# Distanamo <img src="man/figures/distanamo-logo.svg" align="right" width="120"/>
 
 This package allows you to create distance cartograms (or distance anamorphoses, hence the name).
 
