@@ -52,22 +52,3 @@ plot.interpolation_grid <- function(
 
   for (i in which) plots[[plot_names[i]]]()
 }
-
-#' Code copied and slightly adapted (to remove support for customizing alpha channel)
-#' from https://github.com/riatelab/mapsf/blob/dev/R/mf_raster_utils.R
-#' @noRd
-get_continuous_pal <- function(breaks, pal) {
-  etendu <- max(breaks) - min(breaks)
-  lb <- length(breaks)
-  dd <- data.frame(from = breaks[1:(lb - 1)], to = breaks[2:lb])
-  dd$diff <- dd$to - dd$from
-  dd$ncol <- round(dd$diff * 1000 / etendu)
-  dd$colfrom <- pal[1:(lb - 1)]
-  dd$colto <- pal[2:lb]
-  l <- list()
-  for (i in 1:(lb - 1)) {
-    l[[i]] <- colorRampPalette(c(dd$colfrom[i], dd$colto[i]), alpha = TRUE)(dd$ncol[i])
-  }
-  p <- do.call(c, l)
-  return(p)
-}

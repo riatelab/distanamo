@@ -1,3 +1,4 @@
+#' @importFrom graphics legend
 #' @export
 plot.multipolar_displacement_result <- function(x, ...) {
   if (!inherits(x, "multipolar_displacement_result")) stop("Not a multipolar_displacement_result object")

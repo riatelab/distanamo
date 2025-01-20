@@ -1,3 +1,4 @@
+#' @importFrom graphics legend
 #' @export
 plot.unipolar_displacement_result <- function(x, ...) {
   if (!inherits(x, "unipolar_displacement_result")) stop("Not a unipolar_displacement_result object")
