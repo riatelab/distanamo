@@ -13,12 +13,18 @@
 #' @export
 #' @examples
 #' library(sf)
-#' start <- st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-#'                  layer = "start", quiet = TRUE)
-#' points <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-#'                    layer = "points", quiet = TRUE)
-#' center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-#'                    layer = "center", quiet = TRUE)
+#' start <- st_read(
+#'   dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'   layer = "start", quiet = TRUE
+#' )
+#' points <- st_read(
+#'   dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'   layer = "points", quiet = TRUE
+#' )
+#' center <- st_read(
+#'   dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'   layer = "center", quiet = TRUE
+#' )
 #'
 #' pos_result <- dc_move_from_reference_point(
 #'   reference_point = start,
@@ -35,20 +41,20 @@ dc_move_from_reference_point <- function(reference_point, other_points, duration
     factor <- 1
   }
   if (factor <= 0) {
-    stop('Factor must be a non-null positive value')
+    stop("Factor must be a non-null positive value")
   }
   if (length(sf::st_geometry(reference_point)) != 1) {
-    stop('Reference point must be a single point')
+    stop("Reference point must be a single point")
   }
   if (length(sf::st_geometry(other_points)) == 0) {
-    stop('No other points to move')
+    stop("No other points to move")
   }
   if (sf::st_crs(reference_point) != sf::st_crs(other_points)) {
-    stop('The reference point and the other points must have the same CRS')
+    stop("The reference point and the other points must have the same CRS")
   }
 
   points <- sf::st_set_crs(
-    sf::st_sf(geometry=c(sf::st_geometry(reference_point), sf::st_geometry(other_points))),
+    sf::st_sf(geometry = c(sf::st_geometry(reference_point), sf::st_geometry(other_points))),
     sf::st_crs(reference_point)
   )
 

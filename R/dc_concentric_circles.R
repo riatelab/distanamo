@@ -1,8 +1,7 @@
 #' @export
 dc_concentric_circle <- function(
-  positioning_result,
-  steps = list(30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360)
-) {
+    positioning_result,
+    steps = list(30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360)) {
   res <- lapply(
     steps,
     function(s) {

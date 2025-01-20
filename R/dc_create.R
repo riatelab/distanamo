@@ -39,12 +39,18 @@
 #' @export
 #' @examples
 #' library(sf)
-#' start <- st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-#'                  layer = "start", quiet = TRUE)
-#' points <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-#'                    layer = "points", quiet = TRUE)
-#' center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-#'                    layer = "center", quiet = TRUE)
+#' start <- st_read(
+#'   dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'   layer = "start", quiet = TRUE
+#' )
+#' points <- st_read(
+#'   dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'   layer = "points", quiet = TRUE
+#' )
+#' center <- st_read(
+#'   dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'   layer = "center", quiet = TRUE
+#' )
 #'
 #' pos_result <- dc_move_from_reference_point(
 #'   reference_point = start,
@@ -64,25 +70,26 @@
 #' )
 #'
 #' # Deform the target layer
-#' center_deform <- dc_interpolate(interpolation_grid = igrid,
-#'                                 layer_to_deform = center)
+#' center_deform <- dc_interpolate(
+#'   interpolation_grid = igrid,
+#'   layer_to_deform = center
+#' )
 #'
 #' plot(st_geometry(igrid$interpolated_grid), col = NA)
 #' plot(st_geometry(center_deform), add = TRUE)
 #'
-dc_create <- function (
-  source_points,
-  image_points,
-  precision,
-  bbox,
-  niter,
-  sort_by
-) {
+dc_create <- function(
+    source_points,
+    image_points,
+    precision,
+    bbox,
+    niter,
+    sort_by) {
   # The CRS must be the same for the source and image points
   # but we allow the CRS to be missing for both the source and image points
   if (
-    !(is.na(sf::st_crs(source_points)) && is.na(sf::st_crs(image_points)))
-      && sf::st_crs(source_points) != sf::st_crs(image_points)
+    !(is.na(sf::st_crs(source_points)) && is.na(sf::st_crs(image_points))) &&
+      sf::st_crs(source_points) != sf::st_crs(image_points)
   ) {
     stop("The source and image point layers must have the same CRS")
   }
@@ -97,8 +104,8 @@ dc_create <- function (
     if (!sort_by %in% names(source_points) || !sort_by %in% names(image_points)) {
       stop("The source and image point layers must have the field given in the sort_by argument")
     }
-    source_points <- source_points[order(source_points[[sort_by]]),]
-    image_points <- image_points[order(image_points[[sort_by]]),]
+    source_points <- source_points[order(source_points[[sort_by]]), ]
+    image_points <- image_points[order(image_points[[sort_by]]), ]
   }
   # If the niter argument is missing or is not a positive integer, we
   # compute the number of iterations as 4 times the square root of the number
@@ -123,7 +130,7 @@ dc_create <- function (
   e$precision <- precision
   e$resolution <- .Call(savvy_InterpolationGrid_resolution__impl, e$.ptr)
   e$bbox <- .Call(savvy_InterpolationGrid_bbox__impl, e$.ptr)
-  names(e$bbox) <- c('xmin', 'ymin', 'xmax', 'ymax')
+  names(e$bbox) <- c("xmin", "ymin", "xmax", "ymax")
   class(e) <- "interpolation_grid"
   return(e)
 }
@@ -138,7 +145,7 @@ dc_create <- function (
   grid <- sf::st_as_sfc(
     .Call(savvy_InterpolationGrid_get_source_grid__impl, ptr)
   )
-  return(sf::st_sf(geometry=grid))
+  return(sf::st_sf(geometry = grid))
 }
 
 #' .interpolated_grid
@@ -151,7 +158,7 @@ dc_create <- function (
   grid <- sf::st_as_sfc(
     .Call(savvy_InterpolationGrid_get_interpolated_grid__impl, ptr)
   )
-  return(sf::st_sf(geometry=grid))
+  return(sf::st_sf(geometry = grid))
 }
 
 #' .interpolated_points
@@ -164,5 +171,5 @@ dc_create <- function (
   pts <- sf::st_as_sfc(
     .Call(savvy_InterpolationGrid_interpolated_points__impl, ptr)
   )
-  return(sf::st_sf(geometry=pts))
+  return(sf::st_sf(geometry = pts))
 }

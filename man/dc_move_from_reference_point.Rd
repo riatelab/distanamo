@@ -32,12 +32,18 @@ and all the other points.
 }
 \examples{
 library(sf)
-start <- st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-                 layer = "start", quiet = TRUE)
-points <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-                   layer = "points", quiet = TRUE)
-center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-                   layer = "center", quiet = TRUE)
+start <- st_read(
+  dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+  layer = "start", quiet = TRUE
+)
+points <- st_read(
+  dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+  layer = "points", quiet = TRUE
+)
+center <- st_read(
+  dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+  layer = "center", quiet = TRUE
+)
 
 pos_result <- dc_move_from_reference_point(
   reference_point = start,

@@ -22,7 +22,7 @@ summary.interpolation_grid <- function(object, ...) {
   cat("Summary of the interpolation grid:\n")
   cat("Number of cells:", summary_obj$n_cells, "\n")
   cat("Precision:", summary_obj$resolution, paste0("(\u03b1 = ", summary_obj$precision, ")"), "\n")
-  cat("Deformation strength:", summary_obj$deformation_strength,"\n")
+  cat("Deformation strength:", summary_obj$deformation_strength, "\n")
   cat("Mean absolute error:", summary_obj$mae, "\n")
   cat("RMSE (interp - image):", summary_obj$rmse_interp_image, "\n")
   cat("RMSE x (interp - image):", summary_obj$rmse_x_interp_image, "\n")

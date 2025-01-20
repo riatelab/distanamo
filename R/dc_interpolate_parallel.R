@@ -5,10 +5,9 @@
 #' @param layers_to_deform A list of sf layers to interpolate
 #' @return The sf layers deformed by the interpolation grid
 #' @export
-dc_interpolate_parallel <- function (
-  interpolation_grid,
-  layers_to_deform
-) {
+dc_interpolate_parallel <- function(
+    interpolation_grid,
+    layers_to_deform) {
   l <- lapply(layers_to_deform, function(layer) sf::st_as_binary(sf::st_geometry(layer)))
   res <- .Call(
     savvy_InterpolationGrid_transform_layers_parallel__impl,

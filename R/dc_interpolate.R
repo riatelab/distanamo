@@ -7,12 +7,18 @@
 #' @export
 #' @examples
 #' library(sf)
-#' start <- st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-#'                  layer = "start", quiet = TRUE)
-#' points <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-#'                    layer = "points", quiet = TRUE)
-#' center <-  st_read(dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-#'                    layer = "center", quiet = TRUE)
+#' start <- st_read(
+#'   dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'   layer = "start", quiet = TRUE
+#' )
+#' points <- st_read(
+#'   dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'   layer = "points", quiet = TRUE
+#' )
+#' center <- st_read(
+#'   dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
+#'   layer = "center", quiet = TRUE
+#' )
 #'
 #' pos_result <- dc_move_from_reference_point(
 #'   reference_point = start,
@@ -32,15 +38,16 @@
 #' )
 #'
 #' # Deform the target layer
-#' center_deform <- dc_interpolate(interpolation_grid = igrid,
-#'                                 layer_to_deform = center)
+#' center_deform <- dc_interpolate(
+#'   interpolation_grid = igrid,
+#'   layer_to_deform = center
+#' )
 #'
 #' plot(st_geometry(igrid$interpolated_grid), col = NA)
 #' plot(st_geometry(center_deform), add = TRUE)
-dc_interpolate <- function (
-  interpolation_grid,
-  layer_to_deform
-) {
+dc_interpolate <- function(
+    interpolation_grid,
+    layer_to_deform) {
   source_crs <- sf::st_crs(layer_to_deform)
   res <- .Call(
     savvy_InterpolationGrid_transform_layer__impl,

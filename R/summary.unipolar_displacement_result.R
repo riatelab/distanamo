@@ -3,7 +3,7 @@ summary.unipolar_displacement_result <- function(object, ...) {
   if (!inherits(object, "unipolar_displacement_result")) stop("Not a unipolar_displacement_result object")
   # We don't take into account the first point as it is the reference point and
   # it was not moved
-  dists <- sf::st_distance(object$source_points[-1,], object$image_points[-1,], by_element = TRUE)
+  dists <- sf::st_distance(object$source_points[-1, ], object$image_points[-1, ], by_element = TRUE)
   summary_obj <- list(
     min_displacement = min(dists),
     mean_displacement = mean(dists),

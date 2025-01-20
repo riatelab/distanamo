@@ -7,6 +7,8 @@ plot.multipolar_displacement_result <- function(x, ...) {
   c_source <- sf::st_coordinates(x$source_points)
   c_image <- sf::st_coordinates(x$image_points)
   better_arrow(c_source, c_image)
-  legend("topleft", legend = c("Source points", "Image points"),
-         col = c("blue", "red"), pt.lwd = 1, bty = "n", cex = 0.8, pch = 1)
+  legend("topleft",
+    legend = c("Source points", "Image points"),
+    col = c("blue", "red"), pt.lwd = 1, bty = "n", cex = 0.8, pch = 1
+  )
 }
