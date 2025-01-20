@@ -3,10 +3,13 @@
 #' @rdname distanamo
 #' @description
 #' This package enables the creation of what is often defined as a distance
-#' cartogram. This is done by showing (on background(s) layer(s), such as the
-#' territorial divisions of the study zone) the local deformations (calculated
-#' using Waldo Tobler's bidimensional regression) to fit image points to
-#' source points.
+#' cartogram. Distance cartograms are a type of cartogram that deforms the
+#' layers of a map according to the distancesbetween a set of source points
+#' and a set of image points.
+#' This is done by extending (by interpolation) to the layer(s) of the study
+#' area (territorial divisions, network...) the local displacement between the
+#' source coordinates and the image coordinates, derived from the distances
+#' between each pair of homologous points (source / image points).
 #' @docType package
 "_PACKAGE"
 
