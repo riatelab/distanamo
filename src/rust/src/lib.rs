@@ -16,7 +16,7 @@ fn geoms_to_wkb_list(geoms: &[geo_types::Geometry]) -> savvy::Result<OwnedListSe
     for (i, geom) in geoms.iter().enumerate() {
         let mut buf = Vec::new();
         write_geometry(&mut buf, &geom, Default::default())?;
-        out.set_value(i, OwnedRawSexp::try_from_iter(buf)?)?;
+        out.set_value(i, OwnedRawSexp::try_from_slice(buf)?)?;
     }
 
     Ok(out)
@@ -124,9 +124,9 @@ impl InterpolationGrid {
             .values_iter()
             .map(|v| match v.into_typed() {
                 TypedSexp::Raw(rv) => {
-                    let byte_vector = rv.iter().copied().collect::<Vec<_>>();
+                    let byte_vector: &[u8] = rv.as_slice();
                     let geom: geo_types::Geometry<f64> =
-                        read_wkb(&byte_vector).unwrap().to_geometry();
+                        read_wkb(byte_vector).unwrap().to_geometry();
                     geom
                 }
                 _ => panic!("Unexpected input while reading geometries to transform"),
@@ -147,9 +147,9 @@ impl InterpolationGrid {
                     .values_iter()
                     .map(|v| match v.into_typed() {
                         TypedSexp::Raw(rv) => {
-                            let byte_vector = rv.iter().copied().collect::<Vec<_>>();
+                            let byte_vector: &[u8] = rv.as_slice();
                             let geom: geo_types::Geometry<f64> =
-                                read_wkb(&byte_vector).unwrap().to_geometry();
+                                read_wkb(byte_vector).unwrap().to_geometry();
                             geom
                         }
                         _ => panic!("Unexpected input while reading geometries to transform"),
@@ -249,7 +249,11 @@ fn move_points_from_durations(
 
     let mut out_list = OwnedListSexp::new(2, true)?;
     out_list.set_name_and_value(0, "image_points", points)?;
-    out_list.set_name_and_value::<Sexp>(1, "reference_speed", pos_result.reference_speed.try_into()?)?;
+    out_list.set_name_and_value::<Sexp>(
+        1,
+        "reference_speed",
+        pos_result.reference_speed.try_into()?,
+    )?;
     Ok(out_list.into())
 }
 
