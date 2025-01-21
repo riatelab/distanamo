@@ -87,6 +87,7 @@ the mean speed (between the reference point and all the others).
 
 The cartogram obtained by this method qualifies the *unipolar accessibility* of a location
 (the reference point used in the `dc_move_from_reference_point` function).
+It's also sometimes referred to as a *centered time cartogram*.
 
 ```R
 # Read source points and layer to be deformed
@@ -135,7 +136,10 @@ deformed_background <- dc_interpolate(igrid, background_layer)
 plot(sf::st_geometry(deformed_background))
 ```
 
-A popular way of representing this type of cartogram is to add concentric circles (separated by a constant time) around the reference point.
+A popular way of representing this type of cartogram is to add concentric circles (separated by a constant time) around
+the reference point.
+This can be done using the `dc_concentric_circle` function and the result of the `dc_move_from_reference_point` function
+(note that the steps parameter is the time, in the same unit as the durations, between each circle).
 
 ```R
 circles <- dc_concentric_circle(
@@ -146,11 +150,13 @@ circles <- dc_concentric_circle(
 
 ### Generating image points from a durations matrix between all the points
 
-Optionally you can provide a matrix of durations between all the points as well as the positions of the source points and use the
-`dc_generate_positions_from_durations` function to generate the image points.
+Optionally you can provide a matrix of durations between all the points as well as the positions of the source points
+and use the `dc_generate_positions_from_durations` function to generate the image points.
 
-This function will perform Principal Coordinates Analysis (PCoA, a form a Multidimensional scaling) on the duration matrix to generate the positions of the points in a 2D space.
-It will then adjust these points (using an affine or a Euclidean transformation) to the source points to generate the final image points that can be used to create the interpolation grid.
+This function will perform Principal Coordinates Analysis (PCoA, a form a Multidimensional scaling) on the duration matrix
+to generate the positions of the points in a 2D space.
+It will then adjust these points (using an affine or a Euclidean transformation) to the source points to generate the
+final image points that can be used to create the interpolation grid.
 
 The cartogram obtained by this method qualifies the *global accessibility* (or the *multipolar accessibility*)
 of a territory.
@@ -204,21 +210,25 @@ result_layers <- dc_interpolate_parallel(
 )
 ```
 
-## Example
+## Examples
 
 ![Example of distance cartogram](./man/figures/ex-1.png)
-*Map made with [`mapsf`](https://github.com/riatelab/mapsf).*
+
+![Example of distance cartogram](./man/figures/ex-2.png)
+
+*Maps made with [`mapsf`](https://github.com/riatelab/mapsf).*
 
 
 ## More information about the origin of the method
 
-- This is a port of the **[Darcy](https://thema.univ-fcomte.fr/productions/software/darcy/)** standalone software regarding the bidimensional regression and the backgrounds layers deformation.  
-All credit for the contribution of the method goes to **Colette Cauvin** *(Théma - Univ. Franche-Comté)* and for the reference Java implementation goes to **Gilles Vuidel** *(Théma - Univ. Franche-Comté)*.
+- This is a port of the **[Darcy](https://thema.univ-fcomte.fr/productions/software/darcy/)** standalone software regarding the bidimensional regression and the backgrounds
+layers deformation.  
+All credit for the contribution of the method goes to **Colette Cauvin** *(Théma - Univ. Franche-Comté)* and for the
+reference Java implementation goes to **Gilles Vuidel** *(Théma - Univ. Franche-Comté)*.
 
 - This method is also available as a **QGIS plugin** ([GitHub repository](https://github.com/mthh/QgisDistanceCartogramPlugin) / [QGIS plugin repository](https://plugins.qgis.org/plugins/dist_cartogram/)).
 
-- This R package is a wrapper around the Rust library [`distance-cartogram-rs`](https://github.com/mthh/distance-cartogram-rs)
-  which can be used directly from Rust.
+- This R package is a wrapper around the Rust library [`distance-cartogram-rs`](https://github.com/mthh/distance-cartogram-rs) which can be used directly from Rust.
 
 
 ## References
