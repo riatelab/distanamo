@@ -230,6 +230,80 @@ impl InterpolationGrid {
     }
 }
 
+fn prepare_adjustment_result(
+    pos_result: adjustment::AdjustmentResult,
+    adjustment_type: adjustment::AdjustmentType,
+    points: OwnedListSexp,
+) -> savvy::Result<Sexp> {
+    let mut out_list = OwnedListSexp::new(13, true)?;
+
+    out_list.set_name_and_value(0, "image_points", points)?;
+    out_list.set_name_and_value::<Sexp>(
+        1,
+        "a11",
+        pos_result.transformation_matrix.a11.try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(
+        2,
+        "a12",
+        pos_result.transformation_matrix.a12.try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(
+        3,
+        "a13",
+        pos_result.transformation_matrix.a13.try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(
+        4,
+        "a21",
+        pos_result.transformation_matrix.a21.try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(
+        5,
+        "a22",
+        pos_result.transformation_matrix.a22.try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(
+        6,
+        "a23",
+        pos_result.transformation_matrix.a23.try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(
+        7,
+        "adjustment_type",
+        format!("{:?}", adjustment_type).try_into()?,
+    )?;
+    out_list.set_name_and_value::<Sexp>(8, "scale", pos_result.scale.try_into()?)?;
+    out_list.set_name_and_value::<Sexp>(9, "angle", pos_result.angle.try_into()?)?;
+    out_list.set_name_and_value::<Sexp>(10, "rmse", pos_result.rmse.try_into()?)?;
+    out_list.set_name_and_value::<Sexp>(11, "rmse_x", pos_result.rmse_x.try_into()?)?;
+    out_list.set_name_and_value::<Sexp>(12, "rmse_y", pos_result.rmse_y.try_into()?)?;
+
+    Ok(out_list.into())
+}
+
+#[savvy]
+fn adjust(
+    source_points: ListSexp,
+    image_points: ListSexp,
+    adjustment_type: NumericScalar,
+) -> savvy::Result<Sexp> {
+    let source_points = convert_wkb_point_to_coords(source_points)?;
+    let image_points = convert_wkb_point_to_coords(image_points)?;
+
+    let adjustment_type = match adjustment_type.as_usize()? {
+        0 => adjustment::AdjustmentType::Affine,
+        1 => adjustment::AdjustmentType::Euclidean,
+        _ => return Err(savvy_err!("Invalid adjustment type")),
+    };
+
+    let pos_result = adjustment::adjust(&source_points, &image_points, adjustment_type)?;
+
+    let points = geoms_to_wkb_list(&coords_to_points(&pos_result.points_adjusted))?;
+
+    prepare_adjustment_result(pos_result, adjustment_type, points)
+}
+
 #[savvy]
 fn move_points_from_durations(
     points: ListSexp,
@@ -305,51 +379,7 @@ fn generate_positions_from_durations_matrix(
 
     let pos_result = adjustment::adjust(&points, &mds_result, adjustment_type)?;
 
-    let mut out_list = OwnedListSexp::new(13, true)?;
-
     let points = geoms_to_wkb_list(&coords_to_points(&pos_result.points_adjusted))?;
 
-    out_list.set_name_and_value(0, "image_points", points)?;
-    out_list.set_name_and_value::<Sexp>(
-        1,
-        "a11",
-        pos_result.transformation_matrix.a11.try_into()?,
-    )?;
-    out_list.set_name_and_value::<Sexp>(
-        2,
-        "a12",
-        pos_result.transformation_matrix.a12.try_into()?,
-    )?;
-    out_list.set_name_and_value::<Sexp>(
-        3,
-        "a13",
-        pos_result.transformation_matrix.a13.try_into()?,
-    )?;
-    out_list.set_name_and_value::<Sexp>(
-        4,
-        "a21",
-        pos_result.transformation_matrix.a21.try_into()?,
-    )?;
-    out_list.set_name_and_value::<Sexp>(
-        5,
-        "a22",
-        pos_result.transformation_matrix.a22.try_into()?,
-    )?;
-    out_list.set_name_and_value::<Sexp>(
-        6,
-        "a23",
-        pos_result.transformation_matrix.a23.try_into()?,
-    )?;
-    out_list.set_name_and_value::<Sexp>(
-        7,
-        "adjustment_type",
-        format!("{:?}", adjustment_type).try_into()?,
-    )?;
-    out_list.set_name_and_value::<Sexp>(8, "scale", pos_result.scale.try_into()?)?;
-    out_list.set_name_and_value::<Sexp>(9, "angle", pos_result.angle.try_into()?)?;
-    out_list.set_name_and_value::<Sexp>(10, "rmse", pos_result.rmse.try_into()?)?;
-    out_list.set_name_and_value::<Sexp>(11, "rmse_x", pos_result.rmse_x.try_into()?)?;
-    out_list.set_name_and_value::<Sexp>(12, "rmse_y", pos_result.rmse_y.try_into()?)?;
-
-    Ok(out_list.into())
+    prepare_adjustment_result(pos_result, adjustment_type, points)
 }

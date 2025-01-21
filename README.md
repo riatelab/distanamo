@@ -66,10 +66,24 @@ plot(igrid)
 
 ### Adjusting the image points to the source points
 
-In some cases, you may want to adjust the image points to the source points using an affine or a Euclidean transformation:
+In some cases, you may want to adjust the image points to the source points using an affine or a Euclidean transformation.
+
+For example, here, if the image points represent locations in spatial cognition (and thus are not directly comparable to
+the source points, aren't in the same coordinate system, etc.), you need to adjust them to the source points.
 
 ```R
-# TODO
+pos_result <- dc_adjust(
+    source_points = source_pts,
+    image_points = image_pts,
+    method = "euclidean"
+)
+
+# Create the interpolation grid
+igrid <- dc_create(
+  pos_result$source_points,
+  pos_result$image_points,
+  2.0
+)
 ```
 
 This is also what is done internally when using the `dc_generate_positions_from_durations` function (see below)

@@ -34,6 +34,11 @@ SEXP handle_result(SEXP res_) {
     return (SEXP)res;
 }
 
+SEXP savvy_adjust__impl(SEXP c_arg__source_points, SEXP c_arg__image_points, SEXP c_arg__adjustment_type) {
+    SEXP res = savvy_adjust__ffi(c_arg__source_points, c_arg__image_points, c_arg__adjustment_type);
+    return handle_result(res);
+}
+
 SEXP savvy_move_points_from_durations__impl(SEXP c_arg__points, SEXP c_arg__durations, SEXP c_arg__factor) {
     SEXP res = savvy_move_points_from_durations__ffi(c_arg__points, c_arg__durations, c_arg__factor);
     return handle_result(res);
@@ -121,6 +126,7 @@ SEXP savvy_InterpolationGrid_get_deformation_data__impl(SEXP self__) {
 
 
 static const R_CallMethodDef CallEntries[] = {
+    {"savvy_adjust__impl", (DL_FUNC) &savvy_adjust__impl, 3},
     {"savvy_move_points_from_durations__impl", (DL_FUNC) &savvy_move_points_from_durations__impl, 3},
     {"savvy_generate_positions_from_durations_matrix__impl", (DL_FUNC) &savvy_generate_positions_from_durations_matrix__impl, 3},
     {"savvy_InterpolationGrid_new__impl", (DL_FUNC) &savvy_InterpolationGrid_new__impl, 5},
