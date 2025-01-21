@@ -110,7 +110,7 @@ dc_create <- function(
   # If the niter argument is missing or is not a positive integer, we
   # compute the number of iterations as 4 times the square root of the number
   if (missing(niter) || niter <= 0) {
-    niter <- round(4 * sqrt(length(source_points)))
+    niter <- floor(4 * sqrt(length(source_points)))
   }
   e <- new.env(parent = emptyenv())
   e$.ptr <- .Call(
