@@ -46,3 +46,13 @@ NULL
 `[[<-.unipolar_displacement_result` <- function(x, i, value) {
   stop("unipolar_displacement_result cannot be modified", call. = FALSE)
 }
+
+#' @export
+`$<-.adjustment_result` <- function(x, name, value) {
+  stop("adjustment_result cannot be modified", call. = FALSE)
+}
+
+#' @export
+`[[<-.adjustment_result` <- function(x, i, value) {
+  stop("adjustment_result cannot be modified", call. = FALSE)
+}
