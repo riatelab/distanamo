@@ -28,7 +28,12 @@ else
   PROFILE=release
 fi
 
+if [ "${NOT_CRAN}" != "true" ]; then
+  VENDORING="yes"
+fi
+
 sed \
   -e "s/@TARGET@/x86_64-pc-windows-gnu/" \
   -e "s/@PROFILE@/${PROFILE}/" \
+  -e "s|@VENDORING@|${VENDORING}|" \
   src/Makevars.win.in > src/Makevars.win

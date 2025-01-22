@@ -20,6 +20,13 @@ $(STATLIB):
 	# In some environments, ~/.cargo/bin might not be included in PATH, so we need
 	# to set it here to ensure cargo can be invoked. It is appended to PATH and
 	# therefore is only used if cargo is absent from the user's PATH.
+
+	if [ "$(VENDORING)" = "yes" ]; then \
+	  $(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust && \
+	    mkdir -p ./rust/.cargo && \
+	    cp ./cargo_vendor_config.toml ./rust/.cargo/config.toml; \
+	fi
+
 	export PATH="$(PATH):$(HOME)/.cargo/bin" && \
 	  export CC="$(CC)" && \
 	  export CFLAGS="$(CFLAGS)" && \
@@ -33,7 +40,7 @@ $(STATLIB):
 	  fi
 
 C_clean:
-	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS)
+	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) ./rust/.cargo
 
 clean:
-	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) rust/target
+	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) ./rust/.cargo ./rust/vendor ./rust/target

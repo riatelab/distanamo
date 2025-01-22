@@ -98,7 +98,7 @@ dependencies = [
 [[package]]
 name = "distance-cartogram"
 version = "0.1.0"
-source = "git+https://github.com/mthh/distance-cartogram-rs#e7b005194397ebdd3bd7a65d833dea9dcf87e636"
+source = "git+https://github.com/mthh/distance-cartogram-rs#220be0db69ee230f2715c862daebbec622813413"
 dependencies = [
  "csv",
  "geo-types",
