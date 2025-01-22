@@ -152,11 +152,11 @@ plot(sf::st_geometry(deformed_background))
 
 A popular way of representing this type of cartogram is to add concentric circles (separated by a constant time) around
 the reference point.
-This can be done using the `dc_concentric_circle` function and the result of the `dc_move_from_reference_point` function
+This can be done using the `dc_concentric_circles` function and the result of the `dc_move_from_reference_point` function
 (note that the steps parameter is the time, in the same unit as the durations, between each circle).
 
 ```R
-circles <- dc_concentric_circle(
+circles <- dc_concentric_circles(
   pos_result,
   steps = list(10, 20, 30, 40, 50, 60)
 )

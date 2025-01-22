@@ -13,7 +13,7 @@ dc_create(source_points, image_points, precision, bbox, niter, sort_by)
 
 \item{precision}{The precision of the grid to be created
 (a higher value means a higher precision - 0.5 gives usually a coarse result,
-2 is good default, 4 is very detailed).}
+2 is good default, 4 is very detailed)}
 
 \item{bbox}{The bounding box of the grid to be created}
 

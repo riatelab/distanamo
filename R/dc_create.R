@@ -30,7 +30,7 @@
 #' @param image_points The image point layer, sf POINT object
 #' @param precision The precision of the grid to be created
 #' (a higher value means a higher precision - 0.5 gives usually a coarse result,
-#' 2 is good default, 4 is very detailed).
+#' 2 is good default, 4 is very detailed)
 #' @param bbox The bounding box of the grid to be created
 #' @param niter The number of iterations
 #' (default is  `round(4 * sqrt(length(source_points)))`)

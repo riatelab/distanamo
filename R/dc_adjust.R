@@ -1,5 +1,12 @@
 #' dc_adjust
 #'
+#' Computes the positions of the adjusted points by fitting image points to source points.
+#' @param source_points The source point layer, sf POINT object
+#' @param image_points The layer of point to be adjusted to fit `source_points`,
+#' sf POINT object
+#' @param adjustment_type The adjustment type to use, either "euclidean" or "affine"
+#' @return A list object with the transformation matrix, various metrics and
+#' the adjusted points
 #' @export
 dc_adjust <- function(
     source_points,

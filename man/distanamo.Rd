@@ -8,7 +8,7 @@
 \description{
 This package enables the creation of what is often defined as a distance
 cartogram. Distance cartograms are a type of cartogram that deforms the
-layers of a map according to the distancesbetween a set of source points
+layers of a map according to the distances between a set of source points
 and a set of image points.
 This is done by extending (by interpolation) to the layer(s) of the study
 area (territorial divisions, network...) the local displacement between the

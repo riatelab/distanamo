@@ -6,6 +6,18 @@
 \usage{
 dc_adjust(source_points, image_points, adjustment_type = "euclidean")
 }
+\arguments{
+\item{source_points}{The source point layer, sf POINT object}
+
+\item{image_points}{The layer of point to be adjusted to fit \code{source_points},
+sf POINT object}
+
+\item{adjustment_type}{The adjustment type to use, either "euclidean" or "affine"}
+}
+\value{
+A list object with the transformation matrix, various metrics and
+the adjusted points
+}
 \description{
-dc_adjust
+Computes the positions of the adjusted points by fitting image points to source points.
 }
