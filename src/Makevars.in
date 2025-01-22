@@ -21,11 +21,10 @@ $(STATLIB):
 	# to set it here to ensure cargo can be invoked. It is appended to PATH and
 	# therefore is only used if cargo is absent from the user's PATH.
 
-	if [ "$(VENDORING)" = "yes" ]; then \
-	  $(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust && \
+	# Use vendored crates
+	$(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust && \
 	    mkdir -p ./rust/.cargo && \
-	    cp ./cargo_vendor_config.toml ./rust/.cargo/config.toml; \
-	fi
+	    cp ./rust/vendor-config.toml ./rust/.cargo/config.toml
 
 	export PATH="$(PATH):$(HOME)/.cargo/bin" && \
 	  export CC="$(CC)" && \

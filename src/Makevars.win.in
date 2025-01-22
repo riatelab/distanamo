@@ -26,11 +26,11 @@ $(STATLIB):
 	# in actual, but we need this tweak to please the compiler.
 	mkdir -p $(LIBDIR)/libgcc_mock && touch $(LIBDIR)/libgcc_mock/libgcc_eh.a
 
-	if [ "$(VENDORING)" = "yes" ]; then \
-	  $(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust && \
+
+	# Use vendored crates
+	$(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust && \
 	    mkdir -p ./rust/.cargo && \
-	    cp ./cargo_vendor_config.toml ./rust/.cargo/config.toml; \
-	fi
+	    cp ./rust/vendor-config.toml ./rust/.cargo/config.toml
 
 	export CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER="$(CARGO_LINKER)" && \
 	  export LIBRARY_PATH="$${LIBRARY_PATH};$(LIBDIR)/libgcc_mock" && \
