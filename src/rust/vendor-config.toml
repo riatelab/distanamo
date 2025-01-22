@@ -6,5 +6,5 @@ git = "https://github.com/mthh/distance-cartogram-rs"
 replace-with = "vendored-sources"
 
 [source.vendored-sources]
-directory = "rust/vendor"
+directory = "vendor"
 

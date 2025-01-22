@@ -22,7 +22,8 @@ $(STATLIB):
 	# therefore is only used if cargo is absent from the user's PATH.
 
 	# Use vendored crates
-	$(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust && \
+	mkdir -p ./rust/vendor && \
+	    $(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust/vendor && \
 	    mkdir -p ./rust/.cargo && \
 	    cp ./rust/vendor-config.toml ./rust/.cargo/config.toml
 
@@ -37,6 +38,8 @@ $(STATLIB):
 	    export CARGO_PROFILE_RELEASE_PANIC="abort" && \
 	    cargo +nightly build $(CARGO_BUILD_ARGS) --target $(TARGET) -Zbuild-std=panic_abort,std; \
 	  fi
+
+	  rm -Rf ./rust/vendor
 
 C_clean:
 	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) ./rust/.cargo

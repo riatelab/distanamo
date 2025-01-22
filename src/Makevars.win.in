@@ -28,7 +28,8 @@ $(STATLIB):
 
 
 	# Use vendored crates
-	$(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust && \
+	mkdir -p ./rust/vendor && \
+	    $(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust/vendor && \
 	    mkdir -p ./rust/.cargo && \
 	    cp ./rust/vendor-config.toml ./rust/.cargo/config.toml
 
@@ -38,6 +39,8 @@ $(STATLIB):
 	  export CFLAGS="$(CFLAGS)" && \
 	  export RUSTFLAGS="$(RUSTFLAGS)" && \
 	  cargo build --target $(TARGET) --lib --profile $(PROFILE) --manifest-path ./rust/Cargo.toml --target-dir $(TARGET_DIR)
+
+	  rm -Rf ./rust/vendor
 
 C_clean:
 	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) ./rust/.cargo
