@@ -14,7 +14,7 @@ Authors@R:
              role = "ctb",
              comment = c(ORCID = "0000-0002-1932-3323"))
     )
-Description: This package enables the creation of what is often defined as a
+Description: 'distanamo' enables the creation of what is often defined as a
     distance cartogram. This is done by showing (on background(s) layer(s), such as
     the territorial divisions of the study zone) the local deformations
     (calculated using Waldo Tobler's bidimensional regression)
