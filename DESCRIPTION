@@ -14,11 +14,9 @@ Authors@R:
              role = "ctb",
              comment = c(ORCID = "0000-0002-1932-3323"))
     )
-Description: 'distanamo' enables the creation of what is often defined as a
-    distance cartogram. This is done by showing (on background(s) layer(s), such as
-    the territorial divisions of the study zone) the local deformations
-    (calculated using Waldo Tobler's bidimensional regression)
-    to fit image points to source points.
+Description: Creation of distance cartograms by deforming map layers to show
+    the local deformations (computed using Waldo Tobler's bidimensional regression)
+    between source points and image points.
 License: GPL (>= 3)
 BugReports: https://github.com/riatelab/distanamo/issues/
 Depends: 
