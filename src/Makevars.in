@@ -21,11 +21,11 @@ $(STATLIB):
 	# to set it here to ensure cargo can be invoked. It is appended to PATH and
 	# therefore is only used if cargo is absent from the user's PATH.
 
-	# Use vendored crates
-	mkdir -p ./rust/vendor && \
-	    $(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust/vendor && \
-	    mkdir -p ./rust/.cargo && \
-	    cp ./rust/vendor-config.toml ./rust/.cargo/config.toml
+	# Extract vendored crates
+	# mkdir -p ./rust/vendor && \
+	#     $(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust/vendor && \
+	#     mkdir -p ./rust/.cargo && \
+	#     cp ./rust/vendor-config.toml ./rust/.cargo/config.toml
 
 	export PATH="$(PATH):$(HOME)/.cargo/bin" && \
 	  export CC="$(CC)" && \
@@ -39,10 +39,10 @@ $(STATLIB):
 	    cargo +nightly build $(CARGO_BUILD_ARGS) --target $(TARGET) -Zbuild-std=panic_abort,std; \
 	  fi
 
-	  rm -Rf ./rust/vendor
+	  # rm -Rf ./rust/vendor
 
 C_clean:
 	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) ./rust/.cargo
 
 clean:
-	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) ./rust/.cargo ./rust/vendor ./rust/target
+	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) ./rust/.cargo ./rust/target

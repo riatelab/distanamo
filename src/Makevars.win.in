@@ -14,8 +14,6 @@ PKG_LIBS = -L$(LIBDIR) -ldistanamo -lws2_32 -ladvapi32 -luserenv -lbcrypt -lntdl
 # to overwrite it via configuration.
 CARGO_LINKER = x86_64-w64-mingw32.static.posix-gcc.exe
 
-VENDORING = @VENDORING@
-
 all: C_clean
 
 $(SHLIB): $(STATLIB)
@@ -27,11 +25,11 @@ $(STATLIB):
 	mkdir -p $(LIBDIR)/libgcc_mock && touch $(LIBDIR)/libgcc_mock/libgcc_eh.a
 
 
-	# Use vendored crates
-	mkdir -p ./rust/vendor && \
-	    $(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust/vendor && \
-	    mkdir -p ./rust/.cargo && \
-	    cp ./rust/vendor-config.toml ./rust/.cargo/config.toml
+	# Extract vendored crates
+	# mkdir -p ./rust/vendor && \
+	#     $(TAR) --extract --xz -f ./rust/vendor.tar.xz -C ./rust/vendor && \
+	#     mkdir -p ./rust/.cargo && \
+	#     cp ./rust/vendor-config.toml ./rust/.cargo/config.toml
 
 	export CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER="$(CARGO_LINKER)" && \
 	  export LIBRARY_PATH="$${LIBRARY_PATH};$(LIBDIR)/libgcc_mock" && \
@@ -40,10 +38,10 @@ $(STATLIB):
 	  export RUSTFLAGS="$(RUSTFLAGS)" && \
 	  cargo build --target $(TARGET) --lib --profile $(PROFILE) --manifest-path ./rust/Cargo.toml --target-dir $(TARGET_DIR)
 
-	  rm -Rf ./rust/vendor
+	  # rm -Rf ./rust/vendor
 
 C_clean:
 	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) ./rust/.cargo
 
 clean:
-	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) ./rust/.cargo ./rust/vendor ./rust/target
+	rm -Rf $(SHLIB) $(STATLIB) $(OBJECTS) ./rust/.cargo ./rust/target
