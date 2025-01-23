@@ -39,7 +39,7 @@ plot.interpolation_grid <- function(
       mat <- .Call(savvy_InterpolationGrid_get_deformation_data__impl, x$.ptr)
       raster <- terra::rast(t(mat))
       terra::ext(raster) <- terra::ext(x$bbox[1], x$bbox[3], x$bbox[2], x$bbox[4])
-      t_raster <- terra::rast(nrow = nrow(mat) * 10, ncol = ncol(mat) * 10, ext = terra::ext(raster))
+      t_raster <- terra::rast(nrows = nrow(mat) * 10, ncols = ncol(mat) * 10, extent = terra::ext(raster))
       raster_resampled <- terra::resample(raster, t_raster, method = "cubicspline")
       pal <- get_continuous_pal(
         c(min(mat), 1, max(mat)),
