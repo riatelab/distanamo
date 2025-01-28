@@ -16,6 +16,13 @@
 \arguments{
 \item{x}{object of class interpolation_grid}
 
+\item{which}{which plot to display, a subset of 1:4 (the default)}
+
+\item{ask}{logical; if TRUE, the user is asked before each plot}
+
+\item{caption}{captions to appear above the plots; character vector
+or list of valid graphics annotations}
+
 \item{...}{further specifications, see \link{plot} for details}
 }
 \description{

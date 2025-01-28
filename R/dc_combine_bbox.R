@@ -14,10 +14,10 @@
 #'   layer = "prefecture", quiet = TRUE
 #' )
 #'
-#' # Read image points
-#' image_pts <- st_read(
+#' # Read the background layer to deform
+#' background_layer <- st_read(
 #'   dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
-#'   layer = "image-points", quiet = TRUE
+#'   layer = "departement", quiet = TRUE
 #' )
 #'
 #' bbox <- dc_combine_bbox(list(source_pts, background_layer))

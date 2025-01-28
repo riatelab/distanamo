@@ -3,6 +3,10 @@
 #' Plot the interpolation grid, resulting from dc_create
 #'
 #' @param x object of class interpolation_grid
+#' @param which which plot to display, a subset of 1:4 (the default)
+#' @param ask logical; if TRUE, the user is asked before each plot
+#' @param caption captions to appear above the plots; character vector
+#' or list of valid graphics annotations
 #' @param ... further specifications, see \link{plot} for details
 #' @importFrom grDevices devAskNewPage
 #' @importFrom graphics arrows legend
