@@ -9,3 +9,39 @@ template:
     image:
       src: man/figures/logo.png
       alt: "Distanamo logo"
+
+reference:
+  - title: ""
+    desc: "Package description"
+    contents:
+      - distanamo
+  - title: "Creating and working with interpolation grid"
+    # desc: These functions allow you to create and work with interpolation grid.
+    contents:
+      - dc_create
+      - dc_interpolate_parallel
+      - dc_interpolate
+      - plot.interpolation_grid
+      - summary.interpolation_grid
+  - title: "Generation of image points *(unipolar)*"
+    # desc: These functions are dedicated to generating image points from source points and durations.
+    contents:
+      - dc_move_from_reference_point
+      - dc_concentric_circles
+      - plot.unipolar_displacement_result
+      - summary.unipolar_displacement_result
+  - title: "Generation of image points *(multipolar / global)*"
+    # desc: These functions are dedicated to generating image points from source points and durations.
+    contents:
+      - dc_generate_positions_from_durations
+      - plot.multipolar_displacement_result
+      - summary.multipolar_displacement_result
+  - title: "Adjusting image points to the source points"
+    contents:
+        - dc_adjust
+        - plot.adjustment_result
+        - summary.adjustment_result
+  - title: "Utility Functions"
+    # desc: These functions are useful for some utility tasks when working with distance cartograms.
+    contents:
+      - dc_combine_bbox
