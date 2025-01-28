@@ -1,0 +1,19 @@
+---
+title: "Creating a distance cartogram using OSM data"
+author: "Matthieu Viry"
+date: '`r Sys.Date()`'
+output: 
+  rmarkdown::html_vignette:
+    fig_width: 14
+    toc: true
+    toc_depth: 1
+    number_sections: true
+vignette: >  
+  %\VignetteIndexEntry{Creating a distance cartogram using OSM data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
+---
+
+
+## Introduction
+

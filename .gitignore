@@ -50,3 +50,6 @@ rsconnect/
 
 # JetBrains editors files
 .idea/
+
+# Pkgdown stuff
+docs

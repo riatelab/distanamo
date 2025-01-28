@@ -1,0 +1,11 @@
+url: https://riatelab.github.io/distanamo/
+
+home:
+  title: "Distanamo: distance cartograms"
+
+template:
+  bootstrap: 5
+  opengraph:
+    image:
+      src: man/figures/logo.png
+      alt: "Distanamo logo"
