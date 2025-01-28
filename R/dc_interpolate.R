@@ -1,6 +1,5 @@
-#' dc_interpolate
-#'
-#' Interpolate a sf layer using the interpolation grid.
+#' @title Interpolate a sf layer using the interpolation grid
+#' @description Interpolate a sf layer using the interpolation grid.
 #' @param interpolation_grid The interpolation grid
 #' @param layer_to_deform The sf layer to interpolate
 #' @return The sf layer deformed by the interpolation grid

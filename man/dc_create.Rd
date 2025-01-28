@@ -2,7 +2,7 @@
 % Please edit documentation in R/dc_create.R
 \name{dc_create}
 \alias{dc_create}
-\title{dc_create}
+\title{Create an interpolation grid}
 \usage{
 dc_create(source_points, image_points, precision, bbox, niter, sort_by)
 }
@@ -28,8 +28,7 @@ An interpolation grid to be used to transform the layers
 \description{
 Create a new interpolation grid which covers the source points and with a cell size
 deduced from the precision.
-}
-\details{
+
 The grid is then interpolated to match the
 image points. This then allows one to interpolate any point on the grid
 (enabling the deformation of geometries such as background layers)

@@ -18,6 +18,7 @@ between each pair of homologous points (source / image points).
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://riatelab.github.io/distanamo/}
   \item Report bugs at \url{https://github.com/riatelab/distanamo/issues/}
 }
 

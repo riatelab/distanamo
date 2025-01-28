@@ -2,7 +2,7 @@
 % Please edit documentation in R/dc_adjust.R
 \name{dc_adjust}
 \alias{dc_adjust}
-\title{dc_adjust}
+\title{Adjusts image points to source points}
 \usage{
 dc_adjust(source_points, image_points, adjustment_type = "euclidean")
 }

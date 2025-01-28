@@ -2,7 +2,7 @@
 % Please edit documentation in R/dc_move_from_reference_point.R
 \name{dc_move_from_reference_point}
 \alias{dc_move_from_reference_point}
-\title{dc_move_from_reference_point}
+\title{Move points from a reference point}
 \usage{
 dc_move_from_reference_point(
   reference_point,

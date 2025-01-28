@@ -1,6 +1,5 @@
-#' dc_create
-#'
-#' Create a new interpolation grid which covers the source points and with a cell size
+#' @title Create an interpolation grid
+#' @description Create a new interpolation grid which covers the source points and with a cell size
 #' deduced from the precision.
 #'
 #' The grid is then interpolated to match the

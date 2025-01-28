@@ -1,6 +1,5 @@
-#' dc_concentric_circles
-#'
-#' Create concentric circles around the reference point, using the results of the
+#' @title Create concentric circles around the reference point
+#' @description Create concentric circles around the reference point, using the results of the
 #' `dc_move_from_reference_point`.
 #' @param positioning_result The object returned by the `dc_move_from_reference_point`
 #' function.

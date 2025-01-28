@@ -1,8 +1,7 @@
-#' dc_generate_positions_from_durations
-#'
-#' Generate positions from durations matrix, using PCoA to find the relative
-#' positions between points, then perform a procrustes analysis to find the
-#' best fit between the source points and the image points.
+#' @title Generate positions from durations matrix
+#' @description Generate positions from durations matrix, using PCoA to find the relative
+#' positions between points, then find the best fit between the source points and the
+#' image points using an affine or a Euclidean transformation.
 #' @param durations The durations matrix
 #' @param source_points The source points, an sf POINT object
 #' @param adjustment_type The adjustment type to use, either "euclidean" or "affine"

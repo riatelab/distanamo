@@ -2,7 +2,7 @@
 % Please edit documentation in R/dc_interpolate_parallel.R
 \name{dc_interpolate_parallel}
 \alias{dc_interpolate_parallel}
-\title{dc_interpolate_parallel}
+\title{Deform a list of sf layers using the interpolation grid}
 \usage{
 dc_interpolate_parallel(interpolation_grid, layers_to_deform)
 }

@@ -1,6 +1,5 @@
-#' dc_move_from_reference_point
-#'
-#' Move points from a reference point using durations between the reference point
+#' @title Move points from a reference point
+#' @description Move points from a reference point using durations between the reference point
 #' and all the other points.
 #' @param reference_point The point from which the other points will be moved,
 #' an sf POINT object

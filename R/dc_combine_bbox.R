@@ -1,6 +1,5 @@
-#' dc_combine_bbox
-#'
-#' Takes a list of sf objects and compute the bounding box
+#' @title Compute the bounding box that covers all the layers
+#' @description Takes a list of sf objects and compute the bounding box
 #' that covers them all.
 #' @param list_layers A list of sf objects
 #' @return An sf bounding box is returned.

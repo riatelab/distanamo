@@ -2,7 +2,7 @@
 % Please edit documentation in R/dc_concentric_circles.R
 \name{dc_concentric_circles}
 \alias{dc_concentric_circles}
-\title{dc_concentric_circles}
+\title{Create concentric circles around the reference point}
 \usage{
 dc_concentric_circles(
   positioning_result,

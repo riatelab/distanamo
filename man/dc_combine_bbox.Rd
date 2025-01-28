@@ -2,7 +2,7 @@
 % Please edit documentation in R/dc_combine_bbox.R
 \name{dc_combine_bbox}
 \alias{dc_combine_bbox}
-\title{dc_combine_bbox}
+\title{Compute the bounding box that covers all the layers}
 \usage{
 dc_combine_bbox(list_layers)
 }

@@ -1,6 +1,5 @@
-#' dc_interpolate_parallel
-#'
-#' Interpolate a list of sf layers using the interpolation grid.
+#' @title Deform a list of sf layers using the interpolation grid
+#' @description Interpolate a list of sf layers using the interpolation grid.
 #' @param interpolation_grid The interpolation grid
 #' @param layers_to_deform A list of sf layers to interpolate
 #' @return The sf layers deformed by the interpolation grid

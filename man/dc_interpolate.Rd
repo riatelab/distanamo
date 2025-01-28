@@ -2,7 +2,7 @@
 % Please edit documentation in R/dc_interpolate.R
 \name{dc_interpolate}
 \alias{dc_interpolate}
-\title{dc_interpolate}
+\title{Interpolate a sf layer using the interpolation grid}
 \usage{
 dc_interpolate(interpolation_grid, layer_to_deform)
 }

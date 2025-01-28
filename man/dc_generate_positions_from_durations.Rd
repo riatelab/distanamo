@@ -2,7 +2,7 @@
 % Please edit documentation in R/dc_generate_positions_from_durations.R
 \name{dc_generate_positions_from_durations}
 \alias{dc_generate_positions_from_durations}
-\title{dc_generate_positions_from_durations}
+\title{Generate positions from durations matrix}
 \usage{
 dc_generate_positions_from_durations(
   durations,
@@ -23,8 +23,8 @@ to be used with the dc_create function
 }
 \description{
 Generate positions from durations matrix, using PCoA to find the relative
-positions between points, then perform a procrustes analysis to find the
-best fit between the source points and the image points.
+positions between points, then find the best fit between the source points and the
+image points using an affine or a Euclidean transformation.
 }
 \examples{
 library(sf)

@@ -1,6 +1,5 @@
-#' dc_adjust
-#'
-#' Computes the positions of the adjusted points by fitting image points to source points.
+#' @title Adjusts image points to source points
+#' @description Computes the positions of the adjusted points by fitting image points to source points.
 #' @param source_points The source point layer, sf POINT object
 #' @param image_points The layer of point to be adjusted to fit `source_points`,
 #' sf POINT object
