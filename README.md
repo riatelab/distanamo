@@ -1,4 +1,4 @@
-# Distanamo
+# Distanamo <img src="man/figures/distanamo-logo.png" align="right" width="120"/>
 
 <!-- [![R-CMD-check](https://github.com/riatelab/distanamo/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/riatelab/distanamo/actions/workflows/R-CMD-check.yaml) -->
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
@@ -49,9 +49,19 @@ They are used to create an interpolation grid that will be used to deform the la
 
 ```R
 # Read source points, image points and the background layer to deform
-source_pts <- sf::st_read('data-source-point.geojson')
-image_pts <- sf::st_read('data-image-point.geojson')
-background_layer <- sf::st_read('background.geojson')
+source_pts <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = 'prefecture', quiet = TRUE
+)
+image_pts <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = 'image-points', quiet = TRUE
+)
+background_layer <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = 'departement', quiet = TRUE
+)
+
 bbox <- sf::st_bbox(background_layer)
 
 # Create the interpolation grid
@@ -108,12 +118,18 @@ It's also sometimes referred to as a *centered time cartogram*.
 
 ```R
 # Read source points and layer to be deformed
-source_pts <- sf::st_read('data-source-point.geojson')
-background_layer <- sf::st_read('background.geojson')
+source_pts <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = 'prefecture', quiet = TRUE
+)
+background_layer <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = 'departement', quiet = TRUE
+)
 bbox <- sf::st_bbox(background_layer)
 
 # Read durations between points
-d <-read.csv('mat.csv', row.names = 1)
+d <- read.csv(system.file("csv/mat.csv", package = "distanamo"), row.names = 1)
 
 # The CSV is a time matrix structured as follow
 #           AGEN   BORDEAUX   GRENOBLE etc.
@@ -180,11 +196,17 @@ of a territory.
 
 ```R
 # Read source points and layer to be deformed
-source_pts <- sf::st_read('data-source-point.geojson')
-background_layer <- sf::st_read('background.geojson')
+source_pts <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = 'prefecture', quiet = TRUE
+)
+background_layer <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = 'departement', quiet = TRUE
+)
 
 # Read durations between points
-d <-read.csv('mat.csv', row.names = 1)
+d <- read.csv(system.file("csv/mat.csv", package = "distanamo"), row.names = 1)
 # The CSV is a time matrix structured as follow
 #           AGEN   BORDEAUX   GRENOBLE etc.
 # AGEN      0.0    111.2      200.3
