@@ -33,50 +33,52 @@
 #' 2 is good default, 4 is very detailed)
 #' @param bbox The bounding box of the grid to be created
 #' @param niter The number of iterations
-#' (default is  `round(4 * sqrt(length(source_points)))`)
+#' (default is `floor(4 * sqrt(length(source_points)))`)
 #' @param sort_by The field to sort the source and image points by
 #' @return An interpolation grid to be used to transform the layers
 #' @export
 #' @examples
 #' library(sf)
-#' start <- st_read(
-#'   dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-#'   layer = "start", quiet = TRUE
-#' )
-#' points <- st_read(
-#'   dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-#'   layer = "points", quiet = TRUE
-#' )
-#' center <- st_read(
-#'   dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-#'   layer = "center", quiet = TRUE
+#'
+#' # Read source points
+#' source_pts <- st_read(
+#'   dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+#'   layer = "prefecture", quiet = TRUE
 #' )
 #'
-#' pos_result <- dc_move_from_reference_point(
-#'   reference_point = start,
-#'   other_points = points,
-#'   duration_col_name = "durations",
-#'   factor = 1
+#' # Read image points
+#' image_pts <- st_read(
+#'   dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+#'   layer = "image-points", quiet = TRUE
 #' )
 #'
-#' bbox <- dc_combine_bbox(list_layers = list(points, center))
+#' # Read the background layer to deform
+#' background_layer <- st_read(
+#'   dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+#'   layer = "departement", quiet = TRUE
+#' )
 #'
 #' # Create the interpolation grid
 #' igrid <- dc_create(
-#'   source_points = pos_result$source_points,
-#'   image_points = pos_result$image_points,
+#'   source_points = source_pts,
+#'   image_points = image_pts,
 #'   precision = 2,
-#'   bbox = bbox,
+#'   bbox = st_bbox(background_layer)
 #' )
+#'
+#' # Plot various depictions of the interpolation grid
+#' plot(igrid)
+#'
+#' # Useful information about the interpolation grid
+#' summary(igrid)
 #'
 #' # Deform the target layer
-#' center_deform <- dc_interpolate(
+#' background_deformed <- dc_interpolate(
 #'   interpolation_grid = igrid,
-#'   layer_to_deform = center
+#'   layer_to_deform = background_layer
 #' )
 #'
-#' plot(st_geometry(igrid$interpolated_grid), col = NA)
-#' plot(st_geometry(center_deform), add = TRUE)
+#' plot(st_geometry(background_deformed))
 #'
 dc_create <- function(
     source_points,

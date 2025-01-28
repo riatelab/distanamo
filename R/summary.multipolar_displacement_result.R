@@ -1,4 +1,42 @@
+#' summary multipolar_displacement_result object
+#'
+#' Compute summary statistics for multipolar_displacement_result
+#'
+#' @param object object of class multipolar_displacement_result
+#' @param ... further specifications, see \link{summary} for details
 #' @export
+#' @examples
+#' library(sf)
+#'
+#' # Read source points
+#' source_pts <- st_read(
+#'   dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+#'   layer = "prefecture", quiet = TRUE
+#' )
+#'
+#' # Read the background layer to deform
+#' background_layer <- st_read(
+#'   dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+#'   layer = "departement", quiet = TRUE
+#' )
+#'
+#' # Read durations matrix
+#' durations_mat <- read.csv(system.file("csv/mat.csv", package = "distanamo"), row.names = 1)
+#'
+#' # Generate the positions from the whole duration matrix and
+#' # adjust the result to the source points
+#' pos_result <- dc_generate_positions_from_durations(
+#'   durations = durations_mat,
+#'   source_points = source_pts,
+#'   adjustment_type = "euclidean"
+#' )
+#'
+#' # Plot result of the positioning step
+#' plot(pos_result)
+#'
+#' # Summary statistics of the positioning step
+#' summary(pos_result)
+#'
 summary.multipolar_displacement_result <- function(object, ...) {
   if (!inherits(object, "multipolar_displacement_result")) stop("Not a multipolar_displacement_result object")
   dists <- sf::st_distance(object$source_points, object$image_points, by_element = TRUE)

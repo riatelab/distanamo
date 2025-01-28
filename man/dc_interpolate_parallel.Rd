@@ -17,3 +17,46 @@ The sf layers deformed by the interpolation grid
 \description{
 Interpolate a list of sf layers using the interpolation grid.
 }
+\examples{
+library(sf)
+
+# Read source points
+source_pts <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = "prefecture", quiet = TRUE
+)
+
+# Read non adjusted image points
+image_pts_not_adj <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = "image-points-not-adjusted", quiet = TRUE
+)
+
+# Read the background layer to deform
+background_layer <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = "departement", quiet = TRUE
+)
+
+# Adjust image points to source points
+adj_result <- dc_adjust(
+  source_points = source_pts,
+  image_points = image_pts_not_adj,
+  "euclidean"
+)
+
+# Use adjusted points to create the interpolation grid
+igrid <- dc_create(
+  source_points = source_pts,
+  image_points = adj_result$image_points,
+  precision = 2,
+  bbox = st_bbox(background_layer)
+)
+
+# Deform the target layer
+background_deformed <- dc_interpolate_parallel(
+  interpolation_grid = igrid,
+  layers_to_deform = list(background_layer = background_layer, source_pts = source_pts)
+)
+
+}

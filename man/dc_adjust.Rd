@@ -21,3 +21,46 @@ the adjusted points
 \description{
 Computes the positions of the adjusted points by fitting image points to source points.
 }
+\examples{
+library(sf)
+
+# Read source points
+source_pts <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = "prefecture", quiet = TRUE
+)
+
+# Read non adjusted image points
+image_pts_not_adj <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = "image-points-not-adjusted", quiet = TRUE
+)
+
+# Read the background layer to deform
+background_layer <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = "departement", quiet = TRUE
+)
+
+# Adjust image points to source points
+adj_result <- dc_adjust(
+  source_points = source_pts,
+  image_points = image_pts_not_adj,
+  "euclidean"
+)
+
+# Use adjusted points to create the interpolation grid
+igrid <- dc_create(
+  source_points = source_pts,
+  image_points = adj_result$image_points,
+  precision = 2,
+  bbox = st_bbox(background_layer)
+)
+
+# Deform the target layer
+background_deformed <- dc_interpolate(
+  interpolation_grid = igrid,
+  layer_to_deform = background_layer
+)
+
+}

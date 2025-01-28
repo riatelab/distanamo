@@ -18,19 +18,19 @@ that covers them all.
 }
 \examples{
 library(sf)
-start <- st_read(
-  dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-  layer = "start", quiet = TRUE
-)
-points <- st_read(
-  dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-  layer = "points", quiet = TRUE
-)
-center <- st_read(
-  dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-  layer = "center", quiet = TRUE
+
+# Read source points
+source_pts <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = "prefecture", quiet = TRUE
 )
 
-bbox <- dc_combine_bbox(list(start, points, center))
+# Read image points
+image_pts <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = "image-points", quiet = TRUE
+)
+
+bbox <- dc_combine_bbox(list(source_pts, background_layer))
 bbox
 }

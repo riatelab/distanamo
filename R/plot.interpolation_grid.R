@@ -1,6 +1,47 @@
+#' plot interpolation_grid object
+#'
+#' Plot the interpolation grid, resulting from dc_create
+#'
+#' @param x object of class interpolation_grid
+#' @param ... further specifications, see \link{plot} for details
 #' @importFrom grDevices devAskNewPage
 #' @importFrom graphics arrows legend
 #' @export
+#' @examples
+#' library(sf)
+#'
+#' # Read source points
+#' source_pts <- st_read(
+#'   dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+#'   layer = "prefecture", quiet = TRUE
+#' )
+#'
+#' # Read image points
+#' image_pts <- st_read(
+#'   dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+#'   layer = "image-points", quiet = TRUE
+#' )
+#'
+#' # Read the background layer to deform
+#' background_layer <- st_read(
+#'   dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+#'   layer = "departement", quiet = TRUE
+#' )
+#'
+#' # Create the interpolation grid
+#' igrid <- dc_create(
+#'   source_points = source_pts,
+#'   image_points = image_pts,
+#'   precision = 2,
+#'   bbox = st_bbox(background_layer)
+#' )
+#'
+#' # Plot various depictions of the interpolation grid
+#' plot(igrid)
+#'
+#' # Useful information about the interpolation grid
+#' summary(igrid)
+#'
 plot.interpolation_grid <- function(
     x,
     which = 1:4,

@@ -1,4 +1,44 @@
+#' summary adjustment_result object
+#'
+#' Compute summary statistics for adjustment_result
+#'
+#' @param object object of class adjustment_result
+#' @param ... further specifications, see \link{summary} for details
 #' @export
+#' @examples
+#' library(sf)
+#'
+#' # Read source points
+#' source_pts <- st_read(
+#'   dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+#'   layer = "prefecture", quiet = TRUE
+#' )
+#'
+#' # Read non adjusted image points
+#' image_pts_not_adj <- st_read(
+#'   dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+#'   layer = "image-points-not-adjusted", quiet = TRUE
+#' )
+#'
+#' # Read the background layer to deform
+#' background_layer <- st_read(
+#'   dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+#'   layer = "departement", quiet = TRUE
+#' )
+#'
+#' # Adjust image points to source points
+#' adj_result <- dc_adjust(
+#'   source_points = source_pts,
+#'   image_points = image_pts_not_adj,
+#'   "euclidean"
+#' )
+#'
+#' # Plot result of the adjustment step
+#' plot(adj_result)
+#'
+#' # Summary statistics of the adjustment step
+#' summary(adj_result)
+#'
 summary.adjustment_result <- function(object, ...) {
   if (!inherits(object, "adjustment_result")) stop("Not a adjustment_result object")
   dists <- sf::st_distance(object$source_points, object$image_points, by_element = TRUE)

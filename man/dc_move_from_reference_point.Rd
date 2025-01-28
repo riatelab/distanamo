@@ -32,27 +32,52 @@ and all the other points.
 }
 \examples{
 library(sf)
-start <- st_read(
-  dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-  layer = "start", quiet = TRUE
-)
-points <- st_read(
-  dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-  layer = "points", quiet = TRUE
-)
-center <- st_read(
-  dsn = system.file("gpkg/pit.gpkg", package = "distanamo"),
-  layer = "center", quiet = TRUE
+
+# Read source points
+source_pts <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = "prefecture", quiet = TRUE
 )
 
-pos_result <- dc_move_from_reference_point(
-  reference_point = start,
-  other_points = points,
+# Read the background layer to deform
+background_layer <- st_read(
+  dsn = system.file("gpkg/data-prefecture.gpkg", package = "distanamo"),
+  layer = "departement", quiet = TRUE
+)
+
+durations_mat <- read.csv(system.file("csv/mat.csv", package = "distanamo"), row.names = 1)
+dur <- durations_mat["CAEN", ]
+
+source_pts$durations <- as.double(dur)
+
+ref_point <- subset(source_pts, source_pts$NOM_COM == "CAEN")
+other_points <- subset(source_pts, !source_pts$NOM_COM == "CAEN")
+
+# Generate position from durations between the reference point
+# and the other points
+positioning_result <- dc_move_from_reference_point(
+  reference_point = ref_point,
+  other_points = other_points,
   duration_col_name = "durations",
   factor = 1
 )
 
-plot(st_geometry(pos_result$source_points), pch = 4, cex = .5)
-plot(st_geometry(pos_result$image_points), add = TRUE, pch = 4, cex = .5, col = "red")
-plot(st_geometry(center), add = TRUE)
+# Display and plot useful information about the positioning step
+plot(positioning_result)
+summary(positioning_result)
+
+# Create the interpolation grid
+igrid <- dc_create(
+  source_points = positioning_result$source_points,
+  image_points = positioning_result$image_points,
+  precision = 2.0,
+  bbox = st_bbox(background_layer)
+)
+
+# Deform the background layer
+background_deformed <- dc_interpolate(
+  interpolation_grid = igrid,
+  layer_to_deform = background_layer
+)
+
 }
