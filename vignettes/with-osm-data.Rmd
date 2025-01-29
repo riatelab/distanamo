@@ -14,6 +14,297 @@ vignette: >
   %\usepackage[utf8]{inputenc}
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.height = 7
+)
+```
+
 
 ## Introduction
+
+Distance cartograms work by comparing two set of homologous points: the source points and the image points.
+
+In our case, we'll be looking to build a unipolar distance cartogram using only data from OpenStreetMap (OSM): we'll be using both geographic layers describing the territory and travel time data.
+
+This highlights the use of several packages developed at [RIATE](https://riate.cnrs.fr), including :
+
+- `mapsf` to create maps with `sf` objects,
+- `osrm` for calculating distance-time matrices from OSM data,
+- `maposm` to retrieve OSM data (this is a wrapper around `osmdata`),
+- `distanamo` for creating distance cartograms.
+
+
+
+## Installing and importing packages
+
+`mapsf` and `osrm` are available both on CRAN and on [riatelab's r-universe](https://riatelab.r-universe.dev/builds) while `distanamo` and `maposm` are only available from [riatelab's r-universe](https://riatelab.r-universe.dev/builds).
+
+As a result, we propose to install all the packages from r-universe:
+
+```r
+repos <- c('https://riatelab.r-universe.dev', 'https://cloud.r-project.org')
+
+install.packages("mapsf", repos = repos)
+install.packages("osrm", repos = repos)
+install.packages('distanamo', repos = repos)
+install.packages('maposm', repos = repos)
+```
+
+Once installed, we can import the necessary packages:
+
+```{r}
+library(sf)
+library(mapsf)
+library(osrm)
+library(maposm)
+library(distanamo)
+```
+
+## Fetching OSM data
+
+We are now retrieving OSM data for the study area of our choice: here we are interested in the accessibility (by bike, but we will see this later) from the train station of Grenoble.
+
+Lets 
+
+```{r cache = TRUE}
+bb <- osmdata::getbb("Gare, 38000 Grenoble, France")
+lon <- mean(bb[1, ])
+lat <- mean(bb[2, ])
+res <- get_city(c(lon, lat), r = 5000)
+```
+
+We can see that the resulting object is a list of sf layers: 
+
+```{r}
+print(names(res))
+```
+
+Depending on the radius defined in the `get_city` function the result list contains either individual buildings (if r <= 5000)
+or urban patches (if r > 5000). As a result we need to filter the resulting list to remove any possible `NULL` entry:
+
+```{r}
+res <- res[!unlist(lapply(res, is.null))]
+```
+
+## Defining a reference point
+
+We need to define a reference point from which the travel times will be computed. Since we used the train station of Grenoble as a center point to fetch the data, we can use the center of the circle that includes all the data:
+
+```{r}
+start <- st_centroid(res$circle)
+```
+
+## Sampling points
+
+We then need a set of destinations to compute the travel times to.
+
+To do so, we sample roughly 200 points on the road network:
+
+```{r}
+# x <- st_sample(rbind(res$road,res$street), size = 200, type = "regular" )
+x <- st_sample(res$road, size = 200, type = "regular")
+points <- st_sf(id = seq_along(x), geom = x)
+plot(st_geometry(points))
+```
+
+
+## Making a map of the result
+
+```{r}
+mf_map(res$circle, col = "#f2efe9", border = NA, add = FALSE)
+mf_map(res$green, col = "#c8facc", border = "#c8facc", lwd = .5, add = TRUE)
+mf_map(res$water, col = "#aad3df", border = "#aad3df", lwd = .5, add = TRUE)
+mf_map(res$railway, col = "grey50", lty = 2, lwd = .2, add = TRUE)
+mf_map(res$road, col = "white", border = "white", lwd = .5, add = TRUE)
+mf_map(res$street, col = "white", border = "white", lwd = .5, add = TRUE)
+mf_map(res$building, col = "#d9d0c9", border = "#c6bab1", lwd = .5, add = TRUE)
+mf_map(res$circle, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
+mf_map(start, pch = 23, col = "red", cex = 3, add = T)
+mf_map(points, add = T, col = "blue")
+```
+
+## Computing travel times between the reference point and the sampled points
+
+To do so, we can use the `osrmTable` function from the `osrm` package:
+
+```{r}
+mat <- osrmTable(
+  dst = start,
+  src = points,
+  osrm.profile = "bike"
+)
+points$durations_osrm <- mat$durations
+```
+
+### Alternative to OSRM for computing travel times
+
+Alternatively, if having a Valhalla instance under the hand and if the data preparation step included elevation data, you can also use it to compute travel times and benefit from taking the elevation into account:
+
+```{r}
+library(valhallr)
+
+s <- as.data.frame(st_coordinates(st_transform(start, 'EPSG:4326')))
+names(s) <- c('lon', 'lat')
+
+d <- as.data.frame(st_coordinates(st_transform(points, 'EPSG:4326')))
+names(d) <- c('lon', 'lat')
+
+durs <- sources_to_targets(
+  s,
+  d,
+  costing = 'bicycle',
+  hostname = Sys.getenv('VH_HOSTNAME'),
+  port = Sys.getenv('VH_PORT')
+)
+
+points$durations <- durs$time / 60
+```
+
+Note that we use environment variables to store the hostname and port of the Valhalla instance because this is our
+private instance. You can replace `Sys.getenv('VH_HOSTNAME')` and `Sys.getenv('VH_PORT')` by the actual values you want
+to use.
+
+## Computing the positions of image points
+
+```{r}
+pos_result <- dc_move_from_reference_point(
+  reference_point = start,
+  other_points = points,
+  duration_col_name = "durations"
+)
+```
+
+We can call the `summary` function to ...
+
+```{r}
+summary(pos_result)
+```
+
+We can also plot the resulting object to 
+
+```{r}
+plot(pos_result)
+```
+
+Since 
+
+```{r}
+circles <- dc_concentric_circles(pos_result, list(5, 10, 15, 20, 25, 30))
+```
+
+
+## Creating the distance cartogram
+
+We first need to compute the bounding box of all the layers we want to deform using the interpolation grid:
+
+```{r}
+bbox <- dc_combine_bbox(res)
+```
+
+We can then create the interpolation grid.
+
+The `precision` parameters controls the size of the grid cells (higher is more precise, for example 0.5 generally gives a coarse result, 2 a satisfactory result
+and 4 a particularly fine result). A precision of 2 is usually a good default value and this is what we choose to use here.
+
+
+```{r}
+igrid <- dc_create(
+  source_points = pos_result$source_points,
+  image_points = pos_result$image_points,
+  precision = 2,
+  bbox = bbox
+)
+```
+
+```{r}
+summary(igrid)
+```
+
+
+```{r}
+plot(igrid)
+```
+
+## Deforming the background layers
+
+```{r}
+deformed <- dc_interpolate_parallel(igrid, res)
+```
+
+## Mapping the result
+
+
+```{r}
+mf_map(deformed$circle, col = "#f2efe9", border = NA, add = FALSE)
+mf_map(deformed$green, col = "#c8facc", border = "#c8facc", lwd = .5, add = TRUE)
+mf_map(deformed$water, col = "#aad3df", border = "#aad3df", lwd = .5, add = TRUE)
+mf_map(deformed$railway, col = "grey50", lty = 2, lwd = .2, add = TRUE)
+mf_map(deformed$road, col = "white", border = "white", lwd = .5, add = TRUE)
+mf_map(deformed$street, col = "white", border = "white", lwd = .5, add = TRUE)
+mf_map(deformed$building, col = "#d9d0c9", border = "#c6bab1", lwd = .5, add = TRUE)
+mf_map(deformed$circle, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
+mf_map(igrid$interpolated_grid, col = NA, border = "#940000", lwd = .1, add = TRUE)
+mf_map(start, pch = 16, col = "red", cex = 2, add = TRUE)
+mf_map(sf::st_intersection(circles, sf::st_union(sf::st_buffer(igrid$interpolated_grid, 0))), col = "red", lty = 2, lwd = 2, add = TRUE)
+
+y_pos <- start$geometry[[1]][2]
+
+for (i in 1:4) {
+  mapsf:::shadowtext(
+    sf::st_bbox(circles$geometry[i])$xmax,
+    y_pos,
+    paste(i * 5, 'min'),
+    col = "purple",
+    bg = "white",
+    r = 0.15
+  )
+}
+```
+
+If needed, we can add the various points and their corresponding travel times:
+
+```{r eval = FALSE}
+mvd_pts <- igrid$interpolated_points
+mvd_pts$durations <- c(0, points$durations)
+
+mf_map(deformed$circle, col = "#f2efe9", border = NA, add = FALSE)
+mf_map(deformed$green, col = "#c8facc", border = "#c8facc", lwd = .5, add = TRUE)
+mf_map(deformed$water, col = "#aad3df", border = "#aad3df", lwd = .5, add = TRUE)
+mf_map(deformed$railway, col = "grey50", lty = 2, lwd = .2, add = TRUE)
+mf_map(deformed$road, col = "white", border = "white", lwd = .5, add = TRUE)
+mf_map(deformed$street, col = "white", border = "white", lwd = .5, add = TRUE)
+mf_map(deformed$building, col = "#d9d0c9", border = "#c6bab1", lwd = .5, add = TRUE)
+mf_map(deformed$circle, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
+mf_map(igrid$interpolated_grid, col = NA, border = "#940000", lwd = .1, add = TRUE)
+mf_map(start, pch = 16, col = "red", cex = 2, add = TRUE)
+mf_map(sf::st_intersection(circles, sf::st_union(sf::st_buffer(igrid$interpolated_grid, 0))), col = "red", lty = 2, lwd = 2, add = TRUE)
+
+y_pos <- start$geometry[[1]][2]
+
+for (i in 1:4) {
+  mapsf:::shadowtext(
+          sf::st_bbox(circles$geometry[i])$xmax,
+          y_pos,
+          paste(i * 5, 'min'),
+          col = "purple",
+          bg = "white",
+          r = 0.15
+  )
+}
+
+mf_map(mvd_pts, add = TRUE, col = "blue")
+mf_label(mvd_pts, var = "durations", col = "black", halo = TRUE, overlap = TRUE)
+```
+
+## Conclusion
+
+Distance cartograms are both a way of analyzing space and a way of representing it. 
+In the case of *unipolar* cartograms, as proposed here, reading is generally fairly straightforward, making it easy to highlight locations that are difficult (or at least more difficult than the average accessibility) to reach.
+
 
