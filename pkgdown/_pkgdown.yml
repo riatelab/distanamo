@@ -5,6 +5,8 @@ home:
 
 template:
   bootstrap: 5
+  light-switch: true
+  # bootswatch: spacelab
   opengraph:
     image:
       src: man/figures/logo.png
