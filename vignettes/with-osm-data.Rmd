@@ -32,11 +32,11 @@ Distance cartograms work by comparing two set of homologous points: the source p
 
 In our case, we'll be looking to build a unipolar distance cartogram using only data from OpenStreetMap (OSM): we'll be using both geographic layers describing the territory and travel time data.
 
-This highlights the use of several packages developed at [RIATE](https://riate.cnrs.fr), including :
+This highlights the use of several packages developed at [RIATE](https://github.com/riatelab), including :
 
 - `mapsf` to create maps with `sf` objects,
 - `osrm` for calculating distance-time matrices from OSM data,
-- `maposm` to retrieve OSM data (this is a wrapper around `osmdata`),
+- `maposm` to easily retrieve OSM data (this is a wrapper around `osmdata`),
 - `distanamo` for creating distance cartograms.
 
 
@@ -70,7 +70,7 @@ library(distanamo)
 
 We are now retrieving OSM data for the study area of our choice: here we are interested in the accessibility (by bike, but we will see this later) from the train station of Grenoble.
 
-Lets 
+Lets get the bounding box of the train station of Grenoble and then fetch the data for a radius of 5000 meters around it:
 
 ```{r cache = TRUE}
 bb <- osmdata::getbb("Gare, 38000 Grenoble, France")
@@ -85,7 +85,7 @@ We can see that the resulting object is a list of sf layers:
 print(names(res))
 ```
 
-Depending on the radius defined in the `get_city` function the result list contains either individual buildings (if r <= 5000)
+Depending on the radius defined in the `maposm::get_city` function the result list contains either individual buildings (if r <= 5000)
 or urban patches (if r > 5000). As a result we need to filter the resulting list to remove any possible `NULL` entry:
 
 ```{r}
@@ -125,7 +125,7 @@ mf_map(res$road, col = "white", border = "white", lwd = .5, add = TRUE)
 mf_map(res$street, col = "white", border = "white", lwd = .5, add = TRUE)
 mf_map(res$building, col = "#d9d0c9", border = "#c6bab1", lwd = .5, add = TRUE)
 mf_map(res$circle, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
-mf_map(start, pch = 23, col = "red", cex = 3, add = T)
+mf_map(start, pch = 23, col = "red", cex = 2, add = T)
 mf_map(points, add = T, col = "blue")
 ```
 
@@ -139,7 +139,8 @@ mat <- osrmTable(
   src = points,
   osrm.profile = "bike"
 )
-points$durations_osrm <- mat$durations
+
+points$durations <- mat$durations
 ```
 
 ### Alternative to OSRM for computing travel times
@@ -167,10 +168,15 @@ points$durations <- durs$time / 60
 ```
 
 Note that we use environment variables to store the hostname and port of the Valhalla instance because this is our
-private instance. You can replace `Sys.getenv('VH_HOSTNAME')` and `Sys.getenv('VH_PORT')` by the actual values you want
+private instance. You need to replace `Sys.getenv('VH_HOSTNAME')` and `Sys.getenv('VH_PORT')` by the actual values you want
 to use.
 
 ## Computing the positions of image points
+
+We can now compute the positions of the image points using the `dc_move_from_reference_point` function.
+It takes as input the reference point, the other points, and the column name of the travel times in the `other_points` object.
+
+This function will move the points by computing the reference speed (the average distance / time) and then moving the points further or closer to the reference point depending on the travel time to reach them.
 
 ```{r}
 pos_result <- dc_move_from_reference_point(
@@ -180,34 +186,34 @@ pos_result <- dc_move_from_reference_point(
 )
 ```
 
-We can call the `summary` function to ...
+We can call the `summary` function to obtain a summary of the resulting object:
 
 ```{r}
 summary(pos_result)
 ```
 
-We can also plot the resulting object to 
+We can also plot the resulting object to visualize the positions of the image points and how they have been moved:
 
 ```{r}
 plot(pos_result)
 ```
 
-Since 
+## Creating the concentric circles
 
 ```{r}
 circles <- dc_concentric_circles(pos_result, list(5, 10, 15, 20, 25, 30))
+circles
 ```
-
 
 ## Creating the distance cartogram
 
-We first need to compute the bounding box of all the layers we want to deform using the interpolation grid:
+We first need to compute the bounding box of all the layers we want to deform using the interpolation grid to ensure that the interpolation grid covers the whole area of interest.
 
 ```{r}
 bbox <- dc_combine_bbox(res)
 ```
 
-We can then create the interpolation grid.
+We can then create the interpolation grid:
 
 The `precision` parameters controls the size of the grid cells (higher is more precise, for example 0.5 generally gives a coarse result, 2 a satisfactory result
 and 4 a particularly fine result). A precision of 2 is usually a good default value and this is what we choose to use here.
@@ -222,16 +228,21 @@ igrid <- dc_create(
 )
 ```
 
+Various information can be obtained from the interpolation grid:
+
 ```{r}
 summary(igrid)
 ```
 
+We can also plot the interpolation grid to visualize the source grid, the interpolated grid, the distance between the image points and the interpolated points, and the strength of the deformation.
 
 ```{r}
 plot(igrid)
 ```
 
 ## Deforming the background layers
+
+Since we have multiple layers to deform, we can use the `dc_interpolate_parallel` function to deform all the layers at once:
 
 ```{r}
 deformed <- dc_interpolate_parallel(igrid, res)
@@ -253,12 +264,10 @@ mf_map(igrid$interpolated_grid, col = NA, border = "#940000", lwd = .1, add = TR
 mf_map(start, pch = 16, col = "red", cex = 2, add = TRUE)
 mf_map(sf::st_intersection(circles, sf::st_union(sf::st_buffer(igrid$interpolated_grid, 0))), col = "red", lty = 2, lwd = 2, add = TRUE)
 
-y_pos <- start$geometry[[1]][2]
-
 for (i in 1:4) {
   mapsf:::shadowtext(
     sf::st_bbox(circles$geometry[i])$xmax,
-    y_pos,
+    start$geometry[[1]][2],
     paste(i * 5, 'min'),
     col = "purple",
     bg = "white",
@@ -267,7 +276,8 @@ for (i in 1:4) {
 }
 ```
 
-If needed, we can add the various points and their corresponding travel times:
+If needed, we can add the various points (or a sample of them) and their corresponding travel times
+to see that the deformation has been correctly applied:
 
 ```{r eval = FALSE}
 mvd_pts <- igrid$interpolated_points
@@ -285,12 +295,10 @@ mf_map(igrid$interpolated_grid, col = NA, border = "#940000", lwd = .1, add = TR
 mf_map(start, pch = 16, col = "red", cex = 2, add = TRUE)
 mf_map(sf::st_intersection(circles, sf::st_union(sf::st_buffer(igrid$interpolated_grid, 0))), col = "red", lty = 2, lwd = 2, add = TRUE)
 
-y_pos <- start$geometry[[1]][2]
-
 for (i in 1:4) {
   mapsf:::shadowtext(
           sf::st_bbox(circles$geometry[i])$xmax,
-          y_pos,
+          start$geometry[[1]][2],
           paste(i * 5, 'min'),
           col = "purple",
           bg = "white",
@@ -305,6 +313,8 @@ mf_label(mvd_pts, var = "durations", col = "black", halo = TRUE, overlap = TRUE)
 ## Conclusion
 
 Distance cartograms are both a way of analyzing space and a way of representing it. 
-In the case of *unipolar* cartograms, as proposed here, reading is generally fairly straightforward, making it easy to highlight locations that are difficult (or at least more difficult than the average accessibility) to reach.
+In the case of *unipolar* cartograms, as proposed here, reading is generally fairly straightforward, making it easy to highlight portions of the territory that are difficult (or at least more difficult than the average) to reach for example.
+
+
 
 
