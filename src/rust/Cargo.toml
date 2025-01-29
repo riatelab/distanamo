@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["staticlib", "lib"]
 
 [dependencies]
-savvy = "*"
+savvy = "0.8.3"
 distance-cartogram = { "git" = "https://github.com/mthh/distance-cartogram-rs", "features" = ["moving-points-unipolar", "moving-points-multipolar", "parallel"] }
 geo-types = "0.7.13"
 geo-traits = "0.2.0"
