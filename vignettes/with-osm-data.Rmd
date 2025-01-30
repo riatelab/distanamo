@@ -28,9 +28,9 @@ knitr::opts_chunk$set(
 
 ## Introduction
 
-Distance cartograms work by comparing two set of homologous points: the source points and the image points.
+We are looking to build a unipolar distance cartogram (also called a *centered time cartogram*) using only data from OpenStreetMap (OSM): it is going to use both geographic layers describing the territory and travel time data from OSM.
 
-In our case, we'll be looking to build a unipolar distance cartogram using only data from OpenStreetMap (OSM): we'll be using both geographic layers describing the territory and travel time data.
+This type of cartogram visualizes travelling times from a reference starting location to other destinations in a selected area. In the resulting map, the geographic distance are replaced by time distance and the underlying map layers are deformed accordingly.
 
 This highlights the use of several packages developed at [RIATE](https://github.com/riatelab), including :
 
@@ -38,8 +38,6 @@ This highlights the use of several packages developed at [RIATE](https://github.
 - `osrm` for calculating distance-time matrices from OSM data,
 - `maposm` to easily retrieve OSM data (this is a wrapper around `osmdata`),
 - `distanamo` for creating distance cartograms.
-
-
 
 ## Installing and importing packages
 
@@ -70,7 +68,7 @@ library(distanamo)
 
 We are now retrieving OSM data for the study area of our choice: here we are interested in the accessibility (by bike, but we will see this later) from the train station of Grenoble.
 
-Lets get the bounding box of the train station of Grenoble and then fetch the data for a radius of 5000 meters around it:
+Let's get the bounding box of the train station of Grenoble and then fetch the data for a radius of 5000 meters around it:
 
 ```{r cache = TRUE}
 bb <- osmdata::getbb("Gare, 38000 Grenoble, France")
@@ -102,9 +100,7 @@ start <- st_centroid(res$circle)
 
 ## Sampling points
 
-We then need a set of destinations to compute the travel times to.
-
-To do so, we sample roughly 200 points on the road network:
+We then need a set of destinations to compute the travel times to. To do so, we sample roughly 200 points on the road network:
 
 ```{r}
 # x <- st_sample(rbind(res$road,res$street), size = 200, type = "regular" )
@@ -200,8 +196,16 @@ plot(pos_result)
 
 ## Creating the concentric circles
 
+Since the cartogram will replace the geographic distance by time distance we can create concentric circles to represent the time distance from the reference point.
+Internally, this is possible because the reference speed has been stored in the resulting object of the `dc_move_from_reference_point` function.
+
+The `steps` parameter is a list of the time distances we want to represent in the cartogram, in the same unit as the travel times (here, minutes).
+
 ```{r}
-circles <- dc_concentric_circles(pos_result, list(5, 10, 15, 20, 25, 30))
+circles <- dc_concentric_circles(
+  pos_result,
+  steps = list(5, 10, 15, 20, 25, 30)
+)
 circles
 ```
 
