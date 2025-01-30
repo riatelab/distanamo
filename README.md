@@ -106,15 +106,15 @@ igrid <- dc_create(
 This is also what is done internally when using the `dc_generate_positions_from_durations` function (see below)
 after it has performed a Principal Coordinates Analysis (PCoA) on the duration matrix.
 
-### Generating image points from a reference point and durations from the reference point to all the other points
+### Generating image points from a reference point and travel times from the reference point to all the other points
 
-Optionally you can provide a layer of source points and matrix of duration between
+Optionally you can provide a layer of source points and matrix of durations between
 the points.
 
-This duration matrix will be used to extract the duration between a reference point
+This durations matrix will be used to extract the duration between a reference point
 and all the other points, allowing to use the `dc_move_from_reference_point` function to move closer / farther
 points from the reference point depending on if they can be reached faster or slower of
-the mean speed (between the reference point and all the others).
+the average speed (between the reference point and all the others).
 
 The cartogram obtained by this method qualifies the *unipolar accessibility* of a location
 (the reference point used in the `dc_move_from_reference_point` function).
@@ -176,7 +176,7 @@ plot(sf::st_geometry(deformed_background))
 A popular way of representing this type of cartogram is to add concentric circles (separated by a constant time) around
 the reference point.
 This can be done using the `dc_concentric_circles` function and the result of the `dc_move_from_reference_point` function
-(note that the steps parameter is the time, in the same unit as the durations, between each circle).
+(note that the steps parameter is the travel time, in the same unit as the durations matrix, between each circle).
 
 ```R
 circles <- dc_concentric_circles(
@@ -187,16 +187,16 @@ circles <- dc_concentric_circles(
 
 ### Generating image points from a durations matrix between all the points
 
-Optionally you can provide a matrix of durations between all the points as well as the positions of the source points
+Optionally you can provide a matrix of travel times between all the points as well as the positions of the source points
 and use the `dc_generate_positions_from_durations` function to generate the image points.
 
-This function will perform Principal Coordinates Analysis (PCoA, a form a Multidimensional scaling) on the duration matrix
+This function will perform Principal Coordinates Analysis (PCoA, a form a Multidimensional scaling) on the durations matrix
 to generate the positions of the points in a 2D space.
 It will then adjust these points (using an affine or a Euclidean transformation) to the source points to generate the
 final image points that can be used to create the interpolation grid.
 
 The cartogram obtained by this method qualifies the *global accessibility* (or the *multipolar accessibility*)
-of a territory.
+of a territory by visualizing the travel times between all pairs of locations.
 
 ```R
 # Read source points and layer to be deformed
