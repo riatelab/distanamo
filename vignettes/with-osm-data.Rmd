@@ -24,7 +24,11 @@ knitr::opts_chunk$set(
   fig.height = 7
 )
 
-par(bg = "#f7f7f7")
+knitr::knit_hooks$set(bg = function(before, options, envir){
+  if (before){
+    par(bg = "#f7f7f7")
+  }
+})
 ```
 
 
@@ -104,7 +108,7 @@ start <- st_centroid(res$circle)
 
 We then need a set of destinations to compute the travel times to. To do so, we sample roughly 200 points on the road network:
 
-```{r}
+```{r, bg = TRUE}
 x <- st_sample(rbind(res$road,res$street), size = 200, type = "regular" )
 # x <- st_sample(res$road, size = 200, type = "regular")
 points <- st_sf(id = seq_along(x), geom = x)
@@ -192,7 +196,7 @@ summary(pos_result)
 
 We can also plot the resulting object to visualize the positions of the image points and how they have been moved:
 
-```{r}
+```{r, bg = TRUE}
 plot(pos_result)
 ```
 
@@ -242,7 +246,7 @@ summary(igrid)
 
 We can also plot the interpolation grid to visualize the source grid, the interpolated grid, the distance between the image points and the interpolated points, and the strength of the deformation.
 
-```{r}
+```{r, bg = TRUE}
 plot(igrid)
 ```
 
