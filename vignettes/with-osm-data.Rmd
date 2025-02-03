@@ -45,7 +45,7 @@ This highlights the use of several packages developed at [RIATE](https://github.
 
 As a result, we propose to install all the packages from r-universe:
 
-```r
+```{r}
 repos <- c('https://riatelab.r-universe.dev', 'https://cloud.r-project.org')
 
 install.packages("mapsf", repos = repos)
