@@ -24,8 +24,8 @@ knitr::opts_chunk$set(
   fig.height = 7
 )
 
-knitr::knit_hooks$set(bg = function(before, options, envir){
-  if (before){
+knitr::knit_hooks$set(bg = function(before, options, envir) {
+  if (before) {
     par(bg = "#f7f7f7")
   }
 })
@@ -52,12 +52,12 @@ This highlights the use of several packages developed at [RIATE](https://github.
 As a result, we propose to install all the packages from r-universe:
 
 ```{r}
-repos <- c('https://riatelab.r-universe.dev', 'https://cloud.r-project.org')
+repos <- c("https://riatelab.r-universe.dev", "https://cloud.r-project.org")
 
 install.packages("mapsf", repos = repos)
 install.packages("osrm", repos = repos)
-install.packages('distanamo', repos = repos)
-install.packages('maposm', repos = repos)
+install.packages("distanamo", repos = repos)
+install.packages("maposm", repos = repos)
 ```
 
 Once installed, we can import the necessary packages:
@@ -109,7 +109,7 @@ start <- st_centroid(res$circle)
 We then need a set of destinations to compute the travel times to. To do so, we sample roughly 200 points on the road network:
 
 ```{r, bg = TRUE}
-x <- st_sample(rbind(res$road,res$street), size = 200, type = "regular" )
+x <- st_sample(rbind(res$road, res$street), size = 200, type = "regular")
 # x <- st_sample(res$road, size = 200, type = "regular")
 points <- st_sf(id = seq_along(x), geom = x)
 plot(st_geometry(points))
