@@ -146,18 +146,18 @@ Alternatively, if having a Valhalla instance under the hand and if the data prep
 ```{r}
 library(valhallr)
 
-s <- as.data.frame(st_coordinates(st_transform(start, 'EPSG:4326')))
-names(s) <- c('lon', 'lat')
+s <- as.data.frame(st_coordinates(st_transform(start, "EPSG:4326")))
+names(s) <- c("lon", "lat")
 
-d <- as.data.frame(st_coordinates(st_transform(points, 'EPSG:4326')))
-names(d) <- c('lon', 'lat')
+d <- as.data.frame(st_coordinates(st_transform(points, "EPSG:4326")))
+names(d) <- c("lon", "lat")
 
 durs <- sources_to_targets(
   s,
   d,
-  costing = 'bicycle',
-  hostname = Sys.getenv('VH_HOSTNAME'),
-  port = Sys.getenv('VH_PORT')
+  costing = "bicycle",
+  hostname = Sys.getenv("VH_HOSTNAME"),
+  port = Sys.getenv("VH_PORT")
 )
 
 points$durations <- durs$time / 60
@@ -272,7 +272,7 @@ for (i in 1:4) {
   mapsf:::shadowtext(
     sf::st_bbox(circles$geometry[i])$xmax,
     start$geometry[[1]][2],
-    paste(i * 5, 'min'),
+    paste(i * 5, "min"),
     col = "purple",
     bg = "white",
     r = 0.15
@@ -301,12 +301,12 @@ mf_map(sf::st_intersection(circles, sf::st_union(sf::st_buffer(igrid$interpolate
 
 for (i in 1:4) {
   mapsf:::shadowtext(
-          sf::st_bbox(circles$geometry[i])$xmax,
-          start$geometry[[1]][2],
-          paste(i * 5, 'min'),
-          col = "purple",
-          bg = "white",
-          r = 0.15
+    sf::st_bbox(circles$geometry[i])$xmax,
+    start$geometry[[1]][2],
+    paste(i * 5, "min"),
+    col = "purple",
+    bg = "white",
+    r = 0.15
   )
 }
 

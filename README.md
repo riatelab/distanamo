@@ -255,9 +255,9 @@ result_layers <- dc_interpolate_parallel(
 
 ## Examples
 
-![Example of distance cartogram (1)](./man/figures/ex-1.png)
+![Example of distance cartogram (Accessibility by bike from the center of Pithiviers)](./man/figures/ex-1.png)
 
-![Example of distance cartogram (2)](./man/figures/ex-2.png)
+![Example of distance cartogram (Accessibility by car from Caen)](./man/figures/ex-2.png)
 
 *Maps made with [`mapsf`](https://github.com/riatelab/mapsf).*
 

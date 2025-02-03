@@ -30,7 +30,6 @@ to the source points, must depend on the studied theme (such as positions in acc
 some helper functions to generate the image points from the durations between the points).
 
 
-
 ### More information about the origin of the method
 
 
@@ -41,17 +40,6 @@ reference Java implementation goes to **Gilles Vuidel** *(Théma - Univ. Franche
 - This method is also available as a **QGIS plugin** ([GitHub repository](https://github.com/mthh/QgisDistanceCartogramPlugin) / [QGIS plugin repository](https://plugins.qgis.org/plugins/dist_cartogram/)).
 
 - This R package is a wrapper around the Rust library [`distance-cartogram-rs`](https://github.com/mthh/distance-cartogram-rs) which can be used directly from Rust.
-
-
-Note that this package is more geared towards the creation of cartograms based on the bidimensional regression
-technique than specifically towards the study and comparison of two 2D configurations in order to assess their
-similarity. For this we recommend using the [BiDimRegression](https://CRAN.R-project.org/package=BiDimRegression)
-package which is geared towards applying bidimensional regression in the area of psychological research, face research
-and comparison of 2D-data patterns in general.
-Other functionalities close to those proposed in this package (in particular concerning multidimensional scaling
-and the rotation/scaling/translating/reflection of one set of points to fit another) can also be found in the
-[Vegan](https://CRAN.R-project.org/package=vegan) package for example.
-
 
 For more references about the method, see the *References* at this end of this document.
 
