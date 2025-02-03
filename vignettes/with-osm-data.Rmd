@@ -23,6 +23,8 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 7
 )
+
+par(bg = "#f7f7f7")
 ```
 
 
@@ -32,7 +34,7 @@ We are looking to build a unipolar distance cartogram (also called a *centered t
 
 This type of cartogram visualizes travelling times from a reference starting location to other destinations in a selected area. In the resulting map, the geographic distance are replaced by time distance and the underlying map layers are deformed accordingly.
 
-This highlights the use of several packages developed at [RIATE](https://github.com/riatelab), including :
+This highlights the use of several packages developed at [RIATE](https://github.com/riatelab), including:
 
 - `mapsf` to create maps with `sf` objects,
 - `osrm` for calculating distance-time matrices from OSM data,
@@ -66,15 +68,15 @@ library(distanamo)
 
 ## Fetching OSM data
 
-We are now retrieving OSM data for the study area of our choice: here we are interested in the accessibility (by bike, but we will see this later) from the train station of Grenoble.
+We are now retrieving OSM data for the study area of our choice: here we are interested in the accessibility (by bike, but we will see this later) from the market hall of Chambéry.
 
-Let's get the bounding box of the train station of Grenoble and then fetch the data for a radius of 5000 meters around it:
+Let's get the coordinates of the address of Chambéry's market hall and then fetch the data for a radius of 3000 meters around it:
 
 ```{r cache = TRUE}
-bb <- osmdata::getbb("Gare, 38000 Grenoble, France")
+bb <- osmdata::getbb("10, Place Georges Clemenceau, 73100 Chambéry, France")
 lon <- mean(bb[1, ])
 lat <- mean(bb[2, ])
-res <- get_city(c(lon, lat), r = 5000)
+res <- get_city(c(lon, lat), r = 3000)
 ```
 
 We can see that the resulting object is a list of sf layers: 
@@ -92,7 +94,7 @@ res <- res[!unlist(lapply(res, is.null))]
 
 ## Defining a reference point
 
-We need to define a reference point from which the travel times will be computed. Since we used the train station of Grenoble as a center point to fetch the data, we can use the center of the circle that includes all the data:
+We need to define a reference point from which the travel times will be computed. Since we used the address of Chambéry's market hall as a center point to fetch the data, we can use the center of the circle that includes all the data:
 
 ```{r}
 start <- st_centroid(res$circle)
@@ -103,8 +105,8 @@ start <- st_centroid(res$circle)
 We then need a set of destinations to compute the travel times to. To do so, we sample roughly 200 points on the road network:
 
 ```{r}
-# x <- st_sample(rbind(res$road,res$street), size = 200, type = "regular" )
-x <- st_sample(res$road, size = 200, type = "regular")
+x <- st_sample(rbind(res$road,res$street), size = 200, type = "regular" )
+# x <- st_sample(res$road, size = 200, type = "regular")
 points <- st_sf(id = seq_along(x), geom = x)
 plot(st_geometry(points))
 ```
@@ -204,7 +206,7 @@ The `steps` parameter is a list of the time distances we want to represent in th
 ```{r}
 circles <- dc_concentric_circles(
   pos_result,
-  steps = list(5, 10, 15, 20, 25, 30)
+  steps = list(5, 10, 15, 20)
 )
 circles
 ```
