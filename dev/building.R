@@ -1,4 +1,4 @@
-build_package <- function(path = ".") {
+build_package <- function(path = ".", build_site = FALSE) {
   # Run styler on R code
   styler::style_pkg(path)
   # Recompile the rust code and generate C bindings
@@ -8,6 +8,10 @@ build_package <- function(path = ".") {
   # Document and load the package
   devtools::document(path)
   devtools::load_all(path)
+  # Build the webite
+  if (build_site) {
+    pkgdown::build_site()
+  }
 }
 
 build_package()
