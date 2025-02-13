@@ -36,7 +36,7 @@ knitr::knit_hooks$set(bg = function(before, options, envir) {
 
 We are looking to build a unipolar distance cartogram (also called a *centered time cartogram*) using only data from OpenStreetMap (OSM): it is going to use both geographic layers describing the territory and travel time data from OSM.
 
-This type of cartogram visualizes travelling times from a reference starting location to other destinations in a selected area. In the resulting map, the geographic distance are replaced by time distance and the underlying map layers are deformed accordingly.
+This type of cartogram visualizes travelling times from a reference starting location to other destinations in a selected area. In the resulting map, the geographic distance is replaced by time distance and the underlying map layers are deformed accordingly.
 
 This highlights the use of several packages developed at [RIATE](https://github.com/riatelab), including:
 
@@ -106,10 +106,12 @@ start <- st_centroid(res$circle)
 
 ## Sampling points
 
-We then need a set of destinations to compute the travel times to. To do so, we sample roughly 200 points on the road network:
+We then need a set of destinations to compute the travel times to. To do so, we sample roughly 200 points on the road network.
+Note that we use both the road and street network layers here, but in some cases (particularly when using a *car* profile) it may be appropriate to use only the road network.
 
 ```{r, bg = TRUE}
 x <- st_sample(rbind(res$road, res$street), size = 200, type = "regular")
+# Or if you want to use only the road network:
 # x <- st_sample(res$road, size = 200, type = "regular")
 points <- st_sf(id = seq_along(x), geom = x)
 plot(st_geometry(points))
@@ -147,7 +149,7 @@ points$durations <- mat$durations
 
 ### Alternative to OSRM for computing travel times
 
-Alternatively, if having a Valhalla instance under the hand and if the data preparation step included elevation data, you can also use it to compute travel times and benefit from taking the elevation into account:
+Alternatively, if having a Valhalla instance on hand and if the data preparation step included elevation data, you can also use it to compute travel times and benefit from taking the elevation into account:
 
 ```{r}
 library(valhallr)
@@ -322,9 +324,6 @@ mf_label(mvd_pts, var = "durations", col = "black", halo = TRUE, overlap = TRUE)
 
 ## Conclusion
 
-Distance cartograms are both a way of analyzing space and a way of representing it. 
+Distance cartograms are both a way of analyzing the accessibility of a territory and a way of depicting it.
 In the case of *unipolar* cartograms, as proposed here, reading is generally fairly straightforward, making it easy to highlight portions of the territory that are difficult (or at least more difficult than the average) to reach for example.
-
-
-
-
+The addition of concentric circles at regular time steps makes it possible to quickly assess the time distance of a portion of the territory from the reference point.
