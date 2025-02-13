@@ -3,8 +3,8 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   distanamo: distanamo.html
-  with-osm-data: with-osm-data.html
-last_built: 2025-02-03T15:28Z
+  web_only/with-osm-data: web_only/with-osm-data.html
+last_built: 2025-02-13T10:36Z
 urls:
   reference: https://riatelab.github.io/distanamo/reference
   article: https://riatelab.github.io/distanamo/articles
