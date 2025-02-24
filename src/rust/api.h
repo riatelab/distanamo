@@ -1,20 +1,20 @@
 SEXP savvy_adjust__ffi(SEXP c_arg__source_points, SEXP c_arg__image_points, SEXP c_arg__adjustment_type);
-SEXP savvy_move_points_from_durations__ffi(SEXP c_arg__points, SEXP c_arg__durations, SEXP c_arg__factor);
 SEXP savvy_generate_positions_from_durations_matrix__ffi(SEXP c_arg__points, SEXP c_arg__durations, SEXP c_arg__adjustment_type);
+SEXP savvy_move_points_from_durations__ffi(SEXP c_arg__points, SEXP c_arg__durations, SEXP c_arg__factor);
 
 // methods and associated functions for InterpolationGrid
-SEXP savvy_InterpolationGrid_new__ffi(SEXP c_arg__source_points, SEXP c_arg__image_points, SEXP c_arg__precision, SEXP c_arg__n_iter, SEXP c_arg__bbox);
-SEXP savvy_InterpolationGrid_get_source_grid__ffi(SEXP self__);
-SEXP savvy_InterpolationGrid_get_interpolated_grid__ffi(SEXP self__);
-SEXP savvy_InterpolationGrid_transform_layer__ffi(SEXP self__, SEXP c_arg__background_layer);
-SEXP savvy_InterpolationGrid_transform_layers_parallel__ffi(SEXP self__, SEXP c_arg__background_layers);
-SEXP savvy_InterpolationGrid_deformation_strength__ffi(SEXP self__);
-SEXP savvy_InterpolationGrid_sum_squared_deformation_strength__ffi(SEXP self__);
-SEXP savvy_InterpolationGrid_resolution__ffi(SEXP self__);
 SEXP savvy_InterpolationGrid_bbox__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_deformation_strength__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_get_deformation_data__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_get_interpolated_grid__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_get_source_grid__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_interpolated_points__ffi(SEXP self__);
 SEXP savvy_InterpolationGrid_mae__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_new__ffi(SEXP c_arg__source_points, SEXP c_arg__image_points, SEXP c_arg__precision, SEXP c_arg__n_iter, SEXP c_arg__bbox);
+SEXP savvy_InterpolationGrid_r_squared__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_resolution__ffi(SEXP self__);
 SEXP savvy_InterpolationGrid_rmse_interp_image__ffi(SEXP self__);
 SEXP savvy_InterpolationGrid_rmse_interp_source__ffi(SEXP self__);
-SEXP savvy_InterpolationGrid_r_squared__ffi(SEXP self__);
-SEXP savvy_InterpolationGrid_interpolated_points__ffi(SEXP self__);
-SEXP savvy_InterpolationGrid_get_deformation_data__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_sum_squared_deformation_strength__ffi(SEXP self__);
+SEXP savvy_InterpolationGrid_transform_layer__ffi(SEXP self__, SEXP c_arg__background_layer);
+SEXP savvy_InterpolationGrid_transform_layers_parallel__ffi(SEXP self__, SEXP c_arg__background_layers);
