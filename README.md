@@ -264,7 +264,7 @@ result_layers <- dc_interpolate_parallel(
 
 ## More information about the origin of the method
 
-- This is a port of the **[Darcy](https://thema.univ-fcomte.fr/productions/software/darcy/)** standalone software regarding the bidimensional regression and the backgrounds
+- This is a port of the **[Darcy](https://thema.univ-fcomte.fr/productions/software/darcy/)** standalone software regarding the bidimensional regression and the background
 layers deformation.  
 All credit for the contribution of the method goes to **Colette Cauvin** *(Théma - Univ. Franche-Comté)* and for the
 reference Java implementation goes to **Gilles Vuidel** *(Théma - Univ. Franche-Comté)*.
