@@ -76,32 +76,27 @@ We are now retrieving OSM data for the study area of our choice: here we are int
 
 Let's get the coordinates of the address of Chambéry's market hall and then fetch the data for a radius of 3000 meters around it:
 
-```{r cache = TRUE}
+```{r, cache = TRUE}
 bb <- osmdata::getbb("10, Place Georges Clemenceau, 73100 Chambéry, France")
 lon <- mean(bb[1, ])
 lat <- mean(bb[2, ])
-res <- get_city(c(lon, lat), r = 3000)
+res <- om_get(c(lon, lat), r = 3000)
 ```
 
 We can see that the resulting object is a list of sf layers: 
 
 ```{r}
-print(names(res))
+names(res)
 ```
 
-Depending on the radius defined in the `maposm::get_city` function the result list contains either individual buildings (if r <= 5000)
-or urban patches (if r > 5000). As a result we need to filter the resulting list to remove any possible `NULL` entry:
 
-```{r}
-res <- res[!unlist(lapply(res, is.null))]
-```
 
 ## Defining a reference point
 
 We need to define a reference point from which the travel times will be computed. Since we used the address of Chambéry's market hall as a center point to fetch the data, we can use the center of the circle that includes all the data:
 
 ```{r}
-start <- st_centroid(res$circle)
+start <- st_centroid(res$zone)
 ```
 
 ## Sampling points
@@ -121,14 +116,14 @@ plot(st_geometry(points))
 ## Making a map of the result
 
 ```{r}
-mf_map(res$circle, col = "#f2efe9", border = NA, add = FALSE)
+mf_map(res$zone, col = "#f2efe9", border = NA, add = FALSE)
 mf_map(res$green, col = "#c8facc", border = "#c8facc", lwd = .5, add = TRUE)
 mf_map(res$water, col = "#aad3df", border = "#aad3df", lwd = .5, add = TRUE)
 mf_map(res$railway, col = "grey50", lty = 2, lwd = .2, add = TRUE)
 mf_map(res$road, col = "white", border = "white", lwd = .5, add = TRUE)
 mf_map(res$street, col = "white", border = "white", lwd = .5, add = TRUE)
 mf_map(res$building, col = "#d9d0c9", border = "#c6bab1", lwd = .5, add = TRUE)
-mf_map(res$circle, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
+mf_map(res$zone, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
 mf_map(start, pch = 23, col = "red", cex = 2, add = T)
 mf_map(points, add = T, col = "blue")
 ```
@@ -264,17 +259,18 @@ deformed <- dc_interpolate_parallel(igrid, res)
 
 
 ```{r}
-mf_map(deformed$circle, col = "#f2efe9", border = NA, add = FALSE)
+mf_map(deformed$zone, col = "#f2efe9", border = NA, add = FALSE)
 mf_map(deformed$green, col = "#c8facc", border = "#c8facc", lwd = .5, add = TRUE)
 mf_map(deformed$water, col = "#aad3df", border = "#aad3df", lwd = .5, add = TRUE)
 mf_map(deformed$railway, col = "grey50", lty = 2, lwd = .2, add = TRUE)
 mf_map(deformed$road, col = "white", border = "white", lwd = .5, add = TRUE)
 mf_map(deformed$street, col = "white", border = "white", lwd = .5, add = TRUE)
 mf_map(deformed$building, col = "#d9d0c9", border = "#c6bab1", lwd = .5, add = TRUE)
-mf_map(deformed$circle, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
+mf_map(deformed$zone, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
 mf_map(igrid$interpolated_grid, col = NA, border = "#940000", lwd = .1, add = TRUE)
 mf_map(start, pch = 16, col = "red", cex = 2, add = TRUE)
-mf_map(sf::st_intersection(circles, sf::st_union(sf::st_buffer(igrid$interpolated_grid, 0))), col = "red", lty = 2, lwd = 2, add = TRUE)
+mf_map(sf::st_intersection(circles, sf::st_union(sf::st_buffer(igrid$interpolated_grid, 0))), 
+       col = "red", lty = 2, lwd = 2, add = TRUE)
 
 for (i in 1:4) {
   mapsf:::shadowtext(
@@ -291,21 +287,22 @@ for (i in 1:4) {
 If needed, we can add the various points (or a sample of them) and their corresponding travel times
 to see that the deformation has been correctly applied:
 
-```{r eval = FALSE}
+```{r eval = TRUE}
 mvd_pts <- igrid$interpolated_points
-mvd_pts$durations <- c(0, points$durations)
+mvd_pts$durations <- round(c(0, points$durations), 1)
 
-mf_map(deformed$circle, col = "#f2efe9", border = NA, add = FALSE)
+mf_map(deformed$zone, col = "#f2efe9", border = NA, add = FALSE)
 mf_map(deformed$green, col = "#c8facc", border = "#c8facc", lwd = .5, add = TRUE)
 mf_map(deformed$water, col = "#aad3df", border = "#aad3df", lwd = .5, add = TRUE)
 mf_map(deformed$railway, col = "grey50", lty = 2, lwd = .2, add = TRUE)
 mf_map(deformed$road, col = "white", border = "white", lwd = .5, add = TRUE)
 mf_map(deformed$street, col = "white", border = "white", lwd = .5, add = TRUE)
 mf_map(deformed$building, col = "#d9d0c9", border = "#c6bab1", lwd = .5, add = TRUE)
-mf_map(deformed$circle, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
+mf_map(deformed$zone, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
 mf_map(igrid$interpolated_grid, col = NA, border = "#940000", lwd = .1, add = TRUE)
 mf_map(start, pch = 16, col = "red", cex = 2, add = TRUE)
-mf_map(sf::st_intersection(circles, sf::st_union(sf::st_buffer(igrid$interpolated_grid, 0))), col = "red", lty = 2, lwd = 2, add = TRUE)
+mf_map(sf::st_intersection(circles, sf::st_union(sf::st_buffer(igrid$interpolated_grid, 0))), 
+       col = "red", lty = 2, lwd = 2, add = TRUE)
 
 for (i in 1:4) {
   mapsf:::shadowtext(
