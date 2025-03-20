@@ -1,6 +1,8 @@
 # Distanamo <img src="man/figures/logo.png" align="right" width="120"/>
 
 <!-- [![R-CMD-check](https://github.com/riatelab/distanamo/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/riatelab/distanamo/actions/workflows/R-CMD-check.yaml) -->
+[![distanamo status
+badge](https://riatelab.r-universe.dev/distanamo/badges/version)](https://riatelab.r-universe.dev/distanamo)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
 This package allows you to create distance cartograms (or distance anamorphoses, hence the name).
