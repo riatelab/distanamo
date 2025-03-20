@@ -31,7 +31,7 @@ and the rotation/scaling/translating/reflection of one set of points to fit anot
 You can install `distanamo` from [riatelab's R-universe](https://riatelab.r-universe.dev/) with:
 
 ```R
-install.packages('distanamo', repos = c('https://riatelab.r-universe.dev', 'https://cloud.r-project.org'))
+install.packages('distanamo', repos = "https://riatelab.r-universe.dev")
 ```
 
 Alternatively, you can install the development version of `distanamo` from GitHub with:
