@@ -74,7 +74,7 @@
                         <h4 data-toc-skip class="author">Matthieu
 Viry</h4>
             
-            <h4 data-toc-skip class="date">2025-03-13</h4>
+            <h4 data-toc-skip class="date">2025-04-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/riatelab/distanamo/blob/HEAD/vignettes/web_only/with-osm-data.Rmd" class="external-link"><code>vignettes/web_only/with-osm-data.Rmd</code></a></small>
       <div class="d-none name"><code>with-osm-data.Rmd</code></div>
@@ -99,7 +99,10 @@ the underlying map layers are deformed accordingly.</p>
 <code>mapsf</code> to create maps with <code>sf</code> objects,</li>
 <li>
 <code>osrm</code> for calculating distance-time matrices from OSM
-data,</li>
+data and an OSRM instance,</li>
+<li>
+<code>valh</code> for calculating distance-time matrices from OSM
+data and a Valhalla instance,</li>
 <li>
 <code>maposm</code> to easily retrieve OSM data (this is a wrapper
 around <code>osmdata</code>),</li>
@@ -136,7 +139,7 @@ r-universe:</p>
 <h2 id="fetching-osm-data">Fetching OSM data<a class="anchor" aria-label="anchor" href="#fetching-osm-data"></a>
 </h2>
 <p>We are now retrieving OSM data for the study area of our choice: here
-we are interested in the accessibility (by bike, but we will see this
+we are interested in the accessibility (by foot, but we will see this
 later) from the market hall of Chambéry.</p>
 <p>Let’s get the coordinates of the address of Chambéry’s market hall
 and then fetch the data for a radius of 3000 meters around it:</p>
@@ -207,12 +210,12 @@ points<a class="anchor" aria-label="anchor" href="#computing-travel-times-betwee
 <code>osrm</code> package:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/osrm/man/osrmTable.html" class="external-link">osrmTable</a></span><span class="op">(</span></span>
-<span>  dst <span class="op">=</span> <span class="va">start</span>,</span>
-<span>  src <span class="op">=</span> <span class="va">points</span>,</span>
-<span>  osrm.profile <span class="op">=</span> <span class="st">"bike"</span></span>
+<span>  src <span class="op">=</span> <span class="va">start</span>,</span>
+<span>  dst <span class="op">=</span> <span class="va">points</span>,</span>
+<span>  osrm.profile <span class="op">=</span> <span class="st">"foot"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">points</span><span class="op">$</span><span class="va">durations</span> <span class="op">&lt;-</span> <span class="va">mat</span><span class="op">$</span><span class="va">durations</span></span></code></pre></div>
+<span><span class="va">points</span><span class="op">$</span><span class="va">durations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">mat</span><span class="op">$</span><span class="va">durations</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="alternative-to-osrm-for-computing-travel-times">Alternative to OSRM for computing travel times<a class="anchor" aria-label="anchor" href="#alternative-to-osrm-for-computing-travel-times"></a>
 </h3>
@@ -220,28 +223,22 @@ points<a class="anchor" aria-label="anchor" href="#computing-travel-times-betwee
 preparation step included elevation data, you can also use it to compute
 travel times and benefit from taking the elevation into account:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/chris31415926535/valhallr" class="external-link">valhallr</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"valh"</span>, repos <span class="op">=</span> <span class="va">repos</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/riatelab/valh" class="external-link">valh</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">start</span>, <span class="st">"EPSG:4326"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lon"</span>, <span class="st">"lat"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">st_transform</a></span><span class="op">(</span><span class="va">points</span>, <span class="st">"EPSG:4326"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lon"</span>, <span class="st">"lat"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">durs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/valhallr/man/sources_to_targets.html" class="external-link">sources_to_targets</a></span><span class="op">(</span></span>
-<span>  <span class="va">s</span>,</span>
-<span>  <span class="va">d</span>,</span>
-<span>  costing <span class="op">=</span> <span class="st">"bicycle"</span>,</span>
-<span>  hostname <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"VH_HOSTNAME"</span><span class="op">)</span>,</span>
-<span>  port <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"VH_PORT"</span><span class="op">)</span></span>
+<span><span class="va">mat_val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/valh/man/vl_matrix.html" class="external-link">vl_matrix</a></span><span class="op">(</span></span>
+<span>  src <span class="op">=</span> <span class="va">start</span>,</span>
+<span>  dst <span class="op">=</span> <span class="va">points</span>,</span>
+<span>  costing <span class="op">=</span> <span class="st">"pedestrian"</span>,</span>
+<span>  server <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"VALHALLA_URL"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">points</span><span class="op">$</span><span class="va">durations</span> <span class="op">&lt;-</span> <span class="va">durs</span><span class="op">$</span><span class="va">time</span> <span class="op">/</span> <span class="fl">60</span></span></code></pre></div>
-<p>Note that we use environment variables to store the hostname and port
-of the Valhalla instance because this is our private instance. You need
-to replace <code>Sys.getenv('VH_HOSTNAME')</code> and
-<code>Sys.getenv('VH_PORT')</code> by the actual values you want to
-use.</p>
+<span><span class="va">points</span><span class="op">$</span><span class="va">durations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">mat_val</span><span class="op">$</span><span class="va">durations</span><span class="op">)</span></span></code></pre></div>
+<p>Note that we use an environment variable to store the url of the
+Valhalla instance because this is our private instance. You need to
+replace <code>Sys.getenv('VALHALLA_URL')</code> by the actual value you
+want to use.</p>
 </div>
 </div>
 <div class="section level2">
@@ -255,7 +252,7 @@ times in the <code>other_points</code> object.</p>
 (the average distance / time) and then moving the points further or
 closer to the reference point depending on the travel time to reach
 them.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pos_result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/dc_move_from_reference_point.html">dc_move_from_reference_point</a></span><span class="op">(</span></span>
 <span>  reference_point <span class="op">=</span> <span class="va">start</span>,</span>
 <span>  other_points <span class="op">=</span> <span class="va">points</span>,</span>
@@ -263,15 +260,15 @@ them.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>We can call the <code>summary</code> function to obtain a summary of
 the resulting object:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">pos_result</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Summary of the unipolar displacement result:</span></span>
-<span><span class="co">#&gt; Min displacement: 0.4697282 [m] </span></span>
-<span><span class="co">#&gt; Mean displacement: 485.8294 [m] </span></span>
-<span><span class="co">#&gt; Max displacement: 1978.529 [m]</span></span></code></pre></div>
+<span><span class="co">#&gt; Min displacement: 3.692405 [m] </span></span>
+<span><span class="co">#&gt; Mean displacement: 359.9702 [m] </span></span>
+<span><span class="co">#&gt; Max displacement: 1276.343 [m]</span></span></code></pre></div>
 <p>We can also plot the resulting object to visualize the positions of
 the image points and how they have been moved:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pos_result</span><span class="op">)</span></span></code></pre></div>
 <p><img src="with-osm-data_files/figure-html/unnamed-chunk-12-1.png" width="768"></p>
 </div>
@@ -286,22 +283,22 @@ reference speed has been stored in the resulting object of the
 <p>The <code>steps</code> parameter is a list of the time distances we
 want to represent in the cartogram, in the same unit as the travel times
 (here, minutes).</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">circles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/dc_concentric_circles.html">dc_concentric_circles</a></span><span class="op">(</span></span>
 <span>  <span class="va">pos_result</span>,</span>
-<span>  steps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">15</span>, <span class="fl">20</span><span class="op">)</span></span>
+<span>  steps <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">30</span>, <span class="fl">40</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">circles</span></span>
 <span><span class="co">#&gt; Simple feature collection with 4 features and 1 field</span></span>
 <span><span class="co">#&gt; Geometry type: LINESTRING</span></span>
 <span><span class="co">#&gt; Dimension:     XY</span></span>
-<span><span class="co">#&gt; Bounding box:  xmin: 652762.2 ymin: 5726235 xmax: 662957.4 ymax: 5736430</span></span>
+<span><span class="co">#&gt; Bounding box:  xmin: 654600.8 ymin: 5728074 xmax: 661118.7 ymax: 5734592</span></span>
 <span><span class="co">#&gt; Projected CRS: WGS 84 / Pseudo-Mercator</span></span>
 <span><span class="co">#&gt;   step                       geometry</span></span>
-<span><span class="co">#&gt; 1    5 LINESTRING (659134.2 573133...</span></span>
-<span><span class="co">#&gt; 2   10 LINESTRING (660408.6 573133...</span></span>
-<span><span class="co">#&gt; 3   15 LINESTRING (661683 5731333,...</span></span>
-<span><span class="co">#&gt; 4   20 LINESTRING (662957.4 573133...</span></span></code></pre></div>
+<span><span class="co">#&gt; 1   10 LINESTRING (658674.5 573133...</span></span>
+<span><span class="co">#&gt; 2   20 LINESTRING (659489.3 573133...</span></span>
+<span><span class="co">#&gt; 3   30 LINESTRING (660304 5731333,...</span></span>
+<span><span class="co">#&gt; 4   40 LINESTRING (661118.7 573133...</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="creating-the-distance-cartogram">Creating the distance cartogram<a class="anchor" aria-label="anchor" href="#creating-the-distance-cartogram"></a>
@@ -309,7 +306,7 @@ want to represent in the cartogram, in the same unit as the travel times
 <p>We first need to compute the bounding box of all the layers we want
 to deform using the interpolation grid to ensure that the interpolation
 grid covers the whole area of interest.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bbox</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/dc_combine_bbox.html">dc_combine_bbox</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
 <p>We can then create the interpolation grid:</p>
 <p>The <code>precision</code> parameters controls the size of the grid
@@ -317,7 +314,7 @@ cells (higher is more precise, for example 0.5 generally gives a coarse
 result, 2 a satisfactory result and 4 a particularly fine result). A
 precision of 2 is usually a good default value and this is what we
 choose to use here.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">igrid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/dc_create.html">dc_create</a></span><span class="op">(</span></span>
 <span>  source_points <span class="op">=</span> <span class="va">pos_result</span><span class="op">$</span><span class="va">source_points</span>,</span>
 <span>  image_points <span class="op">=</span> <span class="va">pos_result</span><span class="op">$</span><span class="va">image_points</span>,</span>
@@ -325,24 +322,24 @@ choose to use here.</p>
 <span>  bbox <span class="op">=</span> <span class="va">bbox</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>Various information can be obtained from the interpolation grid:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">igrid</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Summary of the interpolation grid:</span></span>
 <span><span class="co">#&gt; Number of cells: 900 </span></span>
 <span><span class="co">#&gt; Precision: 211.693 (α = 2) </span></span>
-<span><span class="co">#&gt; Deformation strength: 1.2912 </span></span>
-<span><span class="co">#&gt; Mean absolute error: 64.47526 </span></span>
-<span><span class="co">#&gt; RMSE (interp - image): 81.72795 </span></span>
-<span><span class="co">#&gt; RMSE x (interp - image): 51.80675 </span></span>
-<span><span class="co">#&gt; RMSE y (interp - image): 63.21011 </span></span>
-<span><span class="co">#&gt; RMSE (interp - source): 598.5697 </span></span>
-<span><span class="co">#&gt; RMSE x (interp - source): 469.7113 </span></span>
-<span><span class="co">#&gt; RMSE y (interp - source): 371.0216 </span></span>
-<span><span class="co">#&gt; R squared: 0.9985654</span></span></code></pre></div>
+<span><span class="co">#&gt; Deformation strength: 1.177372 </span></span>
+<span><span class="co">#&gt; Mean absolute error: 50.96566 </span></span>
+<span><span class="co">#&gt; RMSE (interp - image): 66.48959 </span></span>
+<span><span class="co">#&gt; RMSE x (interp - image): 48.76218 </span></span>
+<span><span class="co">#&gt; RMSE y (interp - image): 45.20084 </span></span>
+<span><span class="co">#&gt; RMSE (interp - source): 426.2467 </span></span>
+<span><span class="co">#&gt; RMSE x (interp - source): 313.5549 </span></span>
+<span><span class="co">#&gt; RMSE y (interp - source): 288.7378 </span></span>
+<span><span class="co">#&gt; R squared: 0.9989954</span></span></code></pre></div>
 <p>We can also plot the interpolation grid to visualize the source grid,
 the interpolated grid, the distance between the image points and the
 interpolated points, and the strength of the deformation.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">igrid</span><span class="op">)</span></span></code></pre></div>
 <p><img src="with-osm-data_files/figure-html/unnamed-chunk-17-1.png" width="768"><img src="with-osm-data_files/figure-html/unnamed-chunk-17-2.png" width="768"><img src="with-osm-data_files/figure-html/unnamed-chunk-17-3.png" width="768"><img src="with-osm-data_files/figure-html/unnamed-chunk-17-4.png" width="768"></p>
 </div>
@@ -352,13 +349,13 @@ interpolated points, and the strength of the deformation.</p>
 <p>Since we have multiple layers to deform, we can use the
 <code>dc_interpolate_parallel</code> function to deform all the layers
 at once:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">deformed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/dc_interpolate_parallel.html">dc_interpolate_parallel</a></span><span class="op">(</span><span class="va">igrid</span>, <span class="va">res</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="mapping-the-result">Mapping the result<a class="anchor" aria-label="anchor" href="#mapping-the-result"></a>
 </h2>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://riatelab.github.io/mapsf/reference/mf_map.html" class="external-link">mf_map</a></span><span class="op">(</span><span class="va">deformed</span><span class="op">$</span><span class="va">zone</span>, col <span class="op">=</span> <span class="st">"#f2efe9"</span>, border <span class="op">=</span> <span class="cn">NA</span>, add <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://riatelab.github.io/mapsf/reference/mf_map.html" class="external-link">mf_map</a></span><span class="op">(</span><span class="va">deformed</span><span class="op">$</span><span class="va">green</span>, col <span class="op">=</span> <span class="st">"#c8facc"</span>, border <span class="op">=</span> <span class="st">"#c8facc"</span>, lwd <span class="op">=</span> <span class="fl">.5</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://riatelab.github.io/mapsf/reference/mf_map.html" class="external-link">mf_map</a></span><span class="op">(</span><span class="va">deformed</span><span class="op">$</span><span class="va">water</span>, col <span class="op">=</span> <span class="st">"#aad3df"</span>, border <span class="op">=</span> <span class="st">"#aad3df"</span>, lwd <span class="op">=</span> <span class="fl">.5</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -370,14 +367,13 @@ at once:</p>
 <span><span class="fu"><a href="https://riatelab.github.io/mapsf/reference/mf_map.html" class="external-link">mf_map</a></span><span class="op">(</span><span class="va">igrid</span><span class="op">$</span><span class="va">interpolated_grid</span>, col <span class="op">=</span> <span class="cn">NA</span>, border <span class="op">=</span> <span class="st">"#940000"</span>, lwd <span class="op">=</span> <span class="fl">.1</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://riatelab.github.io/mapsf/reference/mf_map.html" class="external-link">mf_map</a></span><span class="op">(</span><span class="va">start</span>, pch <span class="op">=</span> <span class="fl">16</span>, col <span class="op">=</span> <span class="st">"red"</span>, cex <span class="op">=</span> <span class="fl">2</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://riatelab.github.io/mapsf/reference/mf_map.html" class="external-link">mf_map</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></span><span class="op">(</span><span class="va">circles</span>, <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">st_buffer</a></span><span class="op">(</span><span class="va">igrid</span><span class="op">$</span><span class="va">interpolated_grid</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  col <span class="op">=</span> <span class="st">"red"</span>, lty <span class="op">=</span> <span class="fl">2</span>, lwd <span class="op">=</span> <span class="fl">2</span>, add <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
+<span>       col <span class="op">=</span> <span class="st">"red"</span>, lty <span class="op">=</span> <span class="fl">2</span>, lwd <span class="op">=</span> <span class="fl">2</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">mapsf</span><span class="fu">:::</span><span class="fu">shadowtext</span><span class="op">(</span></span>
 <span>    <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">circles</span><span class="op">$</span><span class="va">geometry</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">xmax</span>,</span>
 <span>    <span class="va">start</span><span class="op">$</span><span class="va">geometry</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">i</span> <span class="op">*</span> <span class="fl">5</span>, <span class="st">"min"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">i</span> <span class="op">*</span> <span class="fl">10</span>, <span class="st">"min"</span><span class="op">)</span>,</span>
 <span>    col <span class="op">=</span> <span class="st">"purple"</span>,</span>
 <span>    bg <span class="op">=</span> <span class="st">"white"</span>,</span>
 <span>    r <span class="op">=</span> <span class="fl">0.15</span></span>
@@ -387,7 +383,7 @@ at once:</p>
 <p>If needed, we can add the various points (or a sample of them) and
 their corresponding travel times to see that the deformation has been
 correctly applied:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mvd_pts</span> <span class="op">&lt;-</span> <span class="va">igrid</span><span class="op">$</span><span class="va">interpolated_points</span></span>
 <span><span class="va">mvd_pts</span><span class="op">$</span><span class="va">durations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">points</span><span class="op">$</span><span class="va">durations</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
@@ -401,15 +397,14 @@ correctly applied:</p>
 <span><span class="fu"><a href="https://riatelab.github.io/mapsf/reference/mf_map.html" class="external-link">mf_map</a></span><span class="op">(</span><span class="va">deformed</span><span class="op">$</span><span class="va">zone</span>, col <span class="op">=</span> <span class="cn">NA</span>, border <span class="op">=</span> <span class="st">"#c6bab1"</span>, lwd <span class="op">=</span> <span class="fl">4</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://riatelab.github.io/mapsf/reference/mf_map.html" class="external-link">mf_map</a></span><span class="op">(</span><span class="va">igrid</span><span class="op">$</span><span class="va">interpolated_grid</span>, col <span class="op">=</span> <span class="cn">NA</span>, border <span class="op">=</span> <span class="st">"#940000"</span>, lwd <span class="op">=</span> <span class="fl">.1</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://riatelab.github.io/mapsf/reference/mf_map.html" class="external-link">mf_map</a></span><span class="op">(</span><span class="va">start</span>, pch <span class="op">=</span> <span class="fl">16</span>, col <span class="op">=</span> <span class="st">"red"</span>, cex <span class="op">=</span> <span class="fl">2</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://riatelab.github.io/mapsf/reference/mf_map.html" class="external-link">mf_map</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></span><span class="op">(</span><span class="va">circles</span>, <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">st_buffer</a></span><span class="op">(</span><span class="va">igrid</span><span class="op">$</span><span class="va">interpolated_grid</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  col <span class="op">=</span> <span class="st">"red"</span>, lty <span class="op">=</span> <span class="fl">2</span>, lwd <span class="op">=</span> <span class="fl">2</span>, add <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://riatelab.github.io/mapsf/reference/mf_map.html" class="external-link">mf_map</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></span><span class="op">(</span><span class="va">circles</span>, <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">st_buffer</a></span><span class="op">(</span><span class="va">igrid</span><span class="op">$</span><span class="va">interpolated_grid</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>       col <span class="op">=</span> <span class="st">"red"</span>, lty <span class="op">=</span> <span class="fl">2</span>, lwd <span class="op">=</span> <span class="fl">2</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">mapsf</span><span class="fu">:::</span><span class="fu">shadowtext</span><span class="op">(</span></span>
 <span>    <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_bbox.html" class="external-link">st_bbox</a></span><span class="op">(</span><span class="va">circles</span><span class="op">$</span><span class="va">geometry</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">xmax</span>,</span>
 <span>    <span class="va">start</span><span class="op">$</span><span class="va">geometry</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">i</span> <span class="op">*</span> <span class="fl">5</span>, <span class="st">"min"</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">i</span> <span class="op">*</span> <span class="fl">10</span>, <span class="st">"min"</span><span class="op">)</span>,</span>
 <span>    col <span class="op">=</span> <span class="st">"purple"</span>,</span>
 <span>    bg <span class="op">=</span> <span class="st">"white"</span>,</span>
 <span>    r <span class="op">=</span> <span class="fl">0.15</span></span>
