@@ -66,7 +66,7 @@ dc_concentric_circles <- function(
   res <- lapply(
     steps,
     function(s) {
-      geom <- sf::st_boundary(sf::st_buffer(positioning_result$reference_point, positioning_result$reference_speed * s))$geom
+      geom <- sf::st_geometry(sf::st_boundary(sf::st_buffer(positioning_result$reference_point, positioning_result$reference_speed * s)))
       return(sf::st_sf(geometry = geom, step = s))
     }
   )
