@@ -43,30 +43,26 @@ This highlights the use of several packages developed at [RIATE](https://github.
 - `mapsf` to create maps with `sf` objects,
 - `osrm` for calculating distance-time matrices from OSM data and an OSRM instance,
 - `valh` for calculating distance-time matrices from OSM data and a Valhalla instance,
-- `maposm` to easily retrieve OSM data (this is a wrapper around `osmdata`),
+- `maposm` to easily retrieve and map OSM data (this is a wrapper around `osmdata`),
 - `distanamo` for creating distance cartograms.
 
 ## Installing and importing packages
 
-`mapsf` and `osrm` are available both on CRAN and on [riatelab's r-universe](https://riatelab.r-universe.dev/builds) while `distanamo` and `maposm` are only available from [riatelab's r-universe](https://riatelab.r-universe.dev/builds).
+`mapsf`, `valh`, and `osrm` are available on CRAN while `distanamo` and `maposm` are only available on [r-universe](https://riatelab.r-universe.dev/builds).
 
-As a result, we propose to install all the packages from r-universe:
-
-```r
-repos <- c("https://riatelab.r-universe.dev", "https://cloud.r-project.org")
-
-install.packages("mapsf", repos = repos)
-install.packages("osrm", repos = repos)
-install.packages("distanamo", repos = repos)
-install.packages("maposm", repos = repos)
+```{r, eval=FALSE}
+install.packages(c("mapsf", "valh", "osrm"))
+repos <-  c("https://riatelab.r-universe.dev", "https://cloud.r-project.org")
+install.packages(c("distanamo", "maposm"), repos = repos)
 ```
 
-Once installed, we can import the necessary packages:
+Once installed, we can load the necessary packages:
 
 ```{r}
 library(sf)
 library(mapsf)
 library(osrm)
+library(valh)
 library(maposm)
 library(distanamo)
 ```
@@ -77,18 +73,34 @@ We are now retrieving OSM data for the study area of our choice: here we are int
 
 Let's get the coordinates of the address of Chambéry's market hall and then fetch the data for a radius of 3000 meters around it:
 
-```{r, cache = TRUE}
+```{r, eval=FALSE}
 bb <- osmdata::getbb("10, Place Georges Clemenceau, 73100 Chambéry, France")
 lon <- mean(bb[1, ])
 lat <- mean(bb[2, ])
 res <- om_get(c(lon, lat), r = 3000)
 ```
 
-We can see that the resulting object is a list of sf layers: 
+```{r, include=FALSE, eval=FALSE}
+bb <- osmdata::getbb("10, Place Georges Clemenceau, 73100 Chambéry, France")
+lon <- mean(bb[1, ])
+lat <- mean(bb[2, ])
+res <- om_get(c(lon, lat), r = 3000)
+om_write(res, filename = "res.gpkg")
+```
+
+```{r, include=FALSE}
+res <- om_read("res.gpkg")
+```
+
+
+We can see that the resulting object is a list of sf layers, we can map with `om_map()`: 
 
 ```{r}
 names(res)
+om_map(res)
 ```
+
+
 
 
 
@@ -106,6 +118,7 @@ We then need a set of destinations to compute the travel times to. To do so, we 
 Note that we use both the road and street network layers here, but in some cases (particularly when using a *car* profile) it may be appropriate to use only the road network.
 
 ```{r, bg = TRUE}
+set.seed(46)
 x <- st_sample(rbind(res$road, res$street), size = 200, type = "regular")
 # Or if you want to use only the road network:
 # x <- st_sample(res$road, size = 200, type = "regular")
@@ -117,14 +130,7 @@ plot(st_geometry(points))
 ## Making a map of the result
 
 ```{r}
-mf_map(res$zone, col = "#f2efe9", border = NA, add = FALSE)
-mf_map(res$green, col = "#c8facc", border = "#c8facc", lwd = .5, add = TRUE)
-mf_map(res$water, col = "#aad3df", border = "#aad3df", lwd = .5, add = TRUE)
-mf_map(res$railway, col = "grey50", lty = 2, lwd = .2, add = TRUE)
-mf_map(res$road, col = "white", border = "white", lwd = .5, add = TRUE)
-mf_map(res$street, col = "white", border = "white", lwd = .5, add = TRUE)
-mf_map(res$building, col = "#d9d0c9", border = "#c6bab1", lwd = .5, add = TRUE)
-mf_map(res$zone, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
+om_map(res, title = "Sampled points")
 mf_map(start, pch = 23, col = "red", cex = 2, add = T)
 mf_map(points, add = T, col = "blue")
 ```
@@ -152,22 +158,18 @@ you can also use it to compute travel times and benefit from taking the elevatio
 install.packages("valh", repos = repos)
 ```
 
-```{r}
+```{r, eval = FALSE}
 library(valh)
 
 mat_val <- vl_matrix(
   src = start,
   dst = points,
-  costing = "pedestrian",
-  server = Sys.getenv("VALHALLA_URL")
+  costing = "pedestrian"
 )
 
 points$durations <- t(mat_val$durations)
 ```
 
-Note that we use an environment variable to store the url of the Valhalla instance because this is our
-private instance. You need to replace `Sys.getenv('VALHALLA_URL')` by the actual value you want
-to use.
 
 ## Computing the positions of image points
 
@@ -216,6 +218,7 @@ circles
 We first need to compute the bounding box of all the layers we want to deform using the interpolation grid to ensure that the interpolation grid covers the whole area of interest.
 
 ```{r}
+
 bbox <- dc_combine_bbox(res)
 ```
 
@@ -242,8 +245,10 @@ summary(igrid)
 
 We can also plot the interpolation grid to visualize the source grid, the interpolated grid, the distance between the image points and the interpolated points, and the strength of the deformation.
 
-```{r, bg = TRUE}
-plot(igrid)
+```{r, bg = TRUE, fig.width=10,fig.height=10, fig.show='hold'}
+par(mfrow = c(2, 2))
+plot(igrid, ask = FALSE)
+par(mfrow = c(1, 1))
 ```
 
 ## Deforming the background layers
@@ -258,29 +263,21 @@ deformed <- dc_interpolate_parallel(igrid, res)
 
 
 ```{r}
-mf_map(deformed$zone, col = "#f2efe9", border = NA, add = FALSE)
-mf_map(deformed$green, col = "#c8facc", border = "#c8facc", lwd = .5, add = TRUE)
-mf_map(deformed$water, col = "#aad3df", border = "#aad3df", lwd = .5, add = TRUE)
-mf_map(deformed$railway, col = "grey50", lty = 2, lwd = .2, add = TRUE)
-mf_map(deformed$road, col = "white", border = "white", lwd = .5, add = TRUE)
-mf_map(deformed$street, col = "white", border = "white", lwd = .5, add = TRUE)
-mf_map(deformed$building, col = "#d9d0c9", border = "#c6bab1", lwd = .5, add = TRUE)
-mf_map(deformed$zone, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
+om_map(deformed, title = "Unipolar accessibility")
 mf_map(igrid$interpolated_grid, col = NA, border = "#940000", lwd = .1, add = TRUE)
 mf_map(start, pch = 16, col = "red", cex = 2, add = TRUE)
-mf_map(sf::st_intersection(circles, sf::st_union(sf::st_buffer(igrid$interpolated_grid, 0))),
+mf_map(st_intersection(st_geometry(circles), st_union(st_buffer(igrid$interpolated_grid, 0))),
        col = "red", lty = 2, lwd = 2, add = TRUE)
-
 for (i in 1:4) {
-  mapsf:::shadowtext(
-    sf::st_bbox(circles$geometry[i])$xmax,
-    start$geometry[[1]][2],
+  text(
+    st_bbox(circles$geometry[i])$xmax,
+    st_coordinates(start)[2],
     paste(i * 10, "min"),
     col = "purple",
-    bg = "white",
-    r = 0.15
+    font = 2
   )
 }
+
 ```
 
 If needed, we can add the various points (or a sample of them) and their corresponding travel times
@@ -290,27 +287,18 @@ to see that the deformation has been correctly applied:
 mvd_pts <- igrid$interpolated_points
 mvd_pts$durations <- round(c(0, points$durations), 1)
 
-mf_map(deformed$zone, col = "#f2efe9", border = NA, add = FALSE)
-mf_map(deformed$green, col = "#c8facc", border = "#c8facc", lwd = .5, add = TRUE)
-mf_map(deformed$water, col = "#aad3df", border = "#aad3df", lwd = .5, add = TRUE)
-mf_map(deformed$railway, col = "grey50", lty = 2, lwd = .2, add = TRUE)
-mf_map(deformed$road, col = "white", border = "white", lwd = .5, add = TRUE)
-mf_map(deformed$street, col = "white", border = "white", lwd = .5, add = TRUE)
-mf_map(deformed$building, col = "#d9d0c9", border = "#c6bab1", lwd = .5, add = TRUE)
-mf_map(deformed$zone, col = NA, border = "#c6bab1", lwd = 4, add = TRUE)
+om_map(deformed, title = "Unipolar accessibility")
 mf_map(igrid$interpolated_grid, col = NA, border = "#940000", lwd = .1, add = TRUE)
 mf_map(start, pch = 16, col = "red", cex = 2, add = TRUE)
-mf_map(sf::st_intersection(circles, sf::st_union(sf::st_buffer(igrid$interpolated_grid, 0))), 
+mf_map(st_intersection(st_geometry(circles), st_union(st_buffer(igrid$interpolated_grid, 0))),
        col = "red", lty = 2, lwd = 2, add = TRUE)
-
 for (i in 1:4) {
-  mapsf:::shadowtext(
-    sf::st_bbox(circles$geometry[i])$xmax,
-    start$geometry[[1]][2],
+  text(
+    st_bbox(circles$geometry[i])$xmax,
+    st_coordinates(start)[2],
     paste(i * 10, "min"),
     col = "purple",
-    bg = "white",
-    r = 0.15
+    font = 2
   )
 }
 
