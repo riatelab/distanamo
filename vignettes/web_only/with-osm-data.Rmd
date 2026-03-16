@@ -164,7 +164,8 @@ library(valh)
 mat_val <- vl_matrix(
   src = start,
   dst = points,
-  costing = "pedestrian"
+  costing = "pedestrian", 
+  server = "http://0.0.0.0:8002"
 )
 
 points$durations <- t(mat_val$durations)

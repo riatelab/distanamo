@@ -167,7 +167,7 @@ alt="Example of distance cartogram (Accessibility by car from Caen)" />
   [`distance-cartogram-rs`](https://github.com/mthh/distance-cartogram-rs)
   which can be used directly from Rust.
 
-## Related efforts
+## Related projects
 
 Note that this package is more geared towards the creation of cartograms
 based on the bidimensional regression technique than specifically
