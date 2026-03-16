@@ -24,10 +24,10 @@
 dc_combine_bbox <- function(list_layers) {
   combined_bbox <- Reduce(function(b1, b2) {
     c(
-      xmin = min(b1["xmin"], b2["xmin"]),
-      ymin = min(b1["ymin"], b2["ymin"]),
-      xmax = max(b1["xmax"], b2["xmax"]),
-      ymax = max(b1["ymax"], b2["ymax"])
+      xmin = min(b1["xmin"], b2["xmin"], na.rm = TRUE),
+      ymin = min(b1["ymin"], b2["ymin"], na.rm = TRUE),
+      xmax = max(b1["xmax"], b2["xmax"], na.rm = TRUE),
+      ymax = max(b1["ymax"], b2["ymax"], na.rm = TRUE)
     )
   }, lapply(list_layers, sf::st_bbox))
 
