@@ -4,6 +4,7 @@
 ^src/rust/.cargo$
 ^src/rust/target$
 ^LICENSE\.md$
+^README\.Rmd$
 
 .idea/
 
